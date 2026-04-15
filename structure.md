@@ -118,7 +118,7 @@ src/
 │       ├── ChildSwitcher.tsx      # Horizontal scroll, tap to switch active child
 │       └── ChildSummaryCard.tsx
 │
-├── hooks/                        # Custom hooks — one file per concern
+<!-- ├── hooks/                        # Custom hooks — one file per concern
 │   ├── useAuth.ts                # Current user, role, logout
 │   ├── useActiveChild.ts         # Parent: currently selected child from Redux
 │   ├── useSchoolId.ts            # schoolId from JWT — used in every API call
@@ -128,9 +128,9 @@ src/
 │   ├── useKeyboard.ts            # Keyboard height for input forms
 │   ├── useDebounce.ts
 │   ├── useImagePicker.ts         # Image picker + ImageKit upload flow
-│   └── useFilePicker.ts          # Document picker + R2 upload flow
+│   └── useFilePicker.ts          # Document picker + R2 upload flow -->
 │
-├── services/                     # API layer — RTK Query
+<!-- ├── services/                     # API layer — RTK Query
 │   ├── api.ts                    # RTK Query base API (axios base + token injection)
 │   ├── auth.service.ts           # login, refresh, logout endpoints
 │   ├── teacher/
@@ -148,16 +148,16 @@ src/
 │       ├── results.service.ts
 │       ├── announcements.service.ts
 │       ├── requests.service.ts
-│       └── notifications.service.ts
+│       └── notifications.service.ts -->
 │
-├── store/                        # Redux slices (client state only)
+<!-- ├── store/                        # Redux slices (client state only)
 │   ├── slices/
 │   │   ├── authSlice.ts          # user, role, isFirstLogin flag
 │   │   ├── activeChildSlice.ts   # Parent: which child is currently selected
 │   │   ├── networkSlice.ts       # isOnline flag
 │   │   └── uiSlice.ts            # toasts, loading overlays, modal state
 │   └── middleware/
-│       └── offlineMiddleware.ts  # Intercepts mutations when offline → MMKV queue
+│       └── offlineMiddleware.ts  # Intercepts mutations when offline → MMKV queue -->
 │
 -------------04/15/2026-------------------
 <!-- ├── types/                        # TypeScript — mirrors backend DTOs exactly
@@ -189,12 +189,12 @@ src/
 -------------04/15/2026-------------------
 
 │
-├── constants/
+<!-- ├── constants/
 │   ├── api.constants.ts          # BASE_URL, endpoint paths
 │   ├── colors.ts                 # Design tokens — maps to NativeWind config
 │   ├── typography.ts             # Font sizes, weights
 │   ├── spacing.ts                # Consistent spacing scale
-│   └── config.ts                 # App-wide config (quiet hours, timeouts etc.)
+│   └── config.ts                 # App-wide config (quiet hours, timeouts etc.) -->
 │
 ├── i18n/                         # Internationalisation
 │   ├── index.ts                  # i18next init

@@ -133,3 +133,11 @@ export const REQUEST_PRIORITY_COLOURS: Record<RequestPriority, string> = {
     HIGH: '#d97706',
     URGENT: '#dc2626',
 };
+
+
+// ─── Update status request ────────────────────────────────────────────────────
+
+export interface UpdateStatusDto {
+    status: RequestStatus;
+    note?: string;
+}
