@@ -159,7 +159,8 @@ src/
 │   └── middleware/
 │       └── offlineMiddleware.ts  # Intercepts mutations when offline → MMKV queue
 │
-├── types/                        # TypeScript — mirrors backend DTOs exactly
+-------------04/15/2026-------------------
+<!-- ├── types/                        # TypeScript — mirrors backend DTOs exactly
 │   ├── auth.types.ts
 │   ├── user.types.ts
 │   ├── school.types.ts
@@ -176,14 +177,17 @@ src/
 │   ├── request.types.ts
 │   ├── notification.types.ts
 │   └── api.types.ts              # ApiResponse<T>, PaginatedResponse<T>, etc.
-│
-├── utils/                        # Pure functions — no side effects
+│ -->
+<!-- ├── utils/                        # Pure functions — no side effects
 │   ├── date.utils.ts             # format, relative time, Tamil calendar
 │   ├── format.utils.ts           # currency (₹), percentage, grade display
 │   ├── validation.utils.ts       # form validators
 │   ├── attendance.utils.ts       # status colour map, icon map
 │   ├── storage.utils.ts          # Keychain read/write wrappers
-│   └── jwt.utils.ts              # decode JWT, extract role/schoolId/exp
+│   └── jwt.utils.ts              # decode JWT, extract role/schoolId/exp -->
+
+-------------04/15/2026-------------------
+
 │
 ├── constants/
 │   ├── api.constants.ts          # BASE_URL, endpoint paths
