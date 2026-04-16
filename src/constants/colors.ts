@@ -182,6 +182,20 @@ export const Colors = {
     overlay: 'rgba(0, 0, 0, 0.5)',
     overlayLight: 'rgba(0, 0, 0, 0.2)',
 
+    // ─── Grey scale ──────────────────────────────────────────────────────────
+    grey50: palette.grey50,
+    grey100: palette.grey100,
+    grey200: palette.grey200,
+    grey300: palette.grey300,
+    grey400: palette.grey400,
+    grey500: palette.grey500,
+    grey600: palette.grey600,
+    grey700: palette.grey700,
+    grey800: palette.grey800,
+    grey900: palette.grey900,
+    white: palette.white,
+    black: palette.black,
+
     // ─── Transparent ───────────────────────────────────────────────────────
     transparent: 'transparent',
 } as const;

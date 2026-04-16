@@ -1,9 +1,9 @@
 src/
 │
-├── app/                          # Root app wiring
+<!-- ├── app/                          # Root app wiring
 │   ├── App.tsx                   # Root component — providers stack
 │   ├── store.ts                  # Redux store configuration
-│   └── rootReducer.ts            # Combined reducer
+│   └── rootReducer.ts            # Combined reducer -->
 │
 ├── navigation/                   # React Navigation
 │   ├── RootNavigator.tsx         # Auth gate — decides which tree to show
@@ -11,26 +11,26 @@ src/
 │   ├── TeacherNavigator.tsx      # Teacher bottom tabs + nested stacks
 │   ├── ParentNavigator.tsx       # Parent bottom tabs + nested stacks
 │   ├── linking.ts                # Deep link config
-│   └── types.ts                  # RootStackParamList + all screen param types
+<!-- │   └── types.ts                  # RootStackParamList + all screen param types -->
 │
 ├── screens/                      # One folder per domain, split by role
 │   │
-│   ├── auth/
+<!-- │   ├── auth/
 │   │   ├── LoginScreen.tsx
-│   │   └── ChangePasswordScreen.tsx   # Forced on first login
+│   │   └── ChangePasswordScreen.tsx   # Forced on first login -->
 │   │
 │   ├── teacher/
-│   │   ├── home/
+<!-- │   │   ├── home/
 │   │   │   └── TeacherHomeScreen.tsx  # Pending tasks dashboard
 │   │   ├── attendance/
 │   │   │   ├── AttendanceClassPickerScreen.tsx
 │   │   │   ├── AttendanceMarkScreen.tsx
-│   │   │   └── AttendanceHistoryScreen.tsx
-│   │   ├── homework/
+│   │   │   └── AttendanceHistoryScreen.tsx -->
+<!-- │   │   ├── homework/
 │   │   │   ├── HomeworkListScreen.tsx
 │   │   │   ├── HomeworkDetailScreen.tsx
 │   │   │   ├── HomeworkCreateScreen.tsx
-│   │   │   └── HomeworkSubmissionsScreen.tsx
+│   │   │   └── HomeworkSubmissionsScreen.tsx -->
 │   │   ├── marks/
 │   │   │   ├── ExamListScreen.tsx
 │   │   │   ├── MarkSheetScreen.tsx
@@ -38,11 +38,11 @@ src/
 │   │   ├── announcements/
 │   │   │   ├── AnnouncementFeedScreen.tsx
 │   │   │   └── AnnouncementCreateScreen.tsx
-│   │   ├── requests/
+<!-- │   │   ├── requests/
 │   │   │   ├── RequestListScreen.tsx
-│   │   │   └── RequestDetailScreen.tsx
-│   │   └── profile/
-│   │       └── TeacherProfileScreen.tsx
+│   │   │   └── RequestDetailScreen.tsx -->
+<!-- │   │   └── profile/
+│   │       └── TeacherProfileScreen.tsx -->
 │   │
 │   └── parent/
 │       ├── home/
@@ -66,7 +66,7 @@ src/
 │           └── ParentProfileScreen.tsx
 │
 ├── components/                   # Reusable UI — never screen-specific logic
-│   ├── common/                   # Truly global atoms
+<!-- │   ├── common/                   # Truly global atoms
 │   │   ├── AppButton.tsx
 │   │   ├── AppText.tsx
 │   │   ├── AppInput.tsx
@@ -74,15 +74,16 @@ src/
 │   │   ├── AppCard.tsx
 │   │   ├── AppChip.tsx
 │   │   ├── AppModal.tsx
+
 │   │   ├── AppBottomSheet.tsx
 │   │   ├── AppAvatar.tsx
 │   │   ├── AppSkeleton.tsx       # Loading skeleton placeholder
 │   │   ├── AppEmptyState.tsx
 │   │   ├── AppErrorBoundary.tsx
 │   │   ├── AppRefreshControl.tsx
-│   │   └── AppStatusBar.tsx
+│   │   └── AppStatusBar.tsx -->
 │   │
-│   ├── layout/
+<!-- │   ├── layout/
 │   │   ├── ScreenWrapper.tsx     # SafeAreaView + KeyboardAvoid + scroll
 │   │   ├── SectionHeader.tsx
 │   │   └── Divider.tsx
@@ -90,9 +91,9 @@ src/
 │   ├── attendance/
 │   │   ├── StudentAttendanceRow.tsx   # Row in mark sheet (name + status toggle)
 │   │   ├── AttendanceStatusBadge.tsx  # PRESENT/ABSENT/LATE/LEAVE chip
-│   │   └── AttendanceSummaryCard.tsx  # Percentage ring + counts
+│   │   └── AttendanceSummaryCard.tsx  # Percentage ring + counts -->
 │   │
-│   ├── homework/
+<!-- │   ├── homework/
 │   │   ├── HomeworkCard.tsx
 │   │   ├── SubmissionStatusRow.tsx
 │   │   └── HomeworkDueBadge.tsx
@@ -100,23 +101,23 @@ src/
 │   ├── marks/
 │   │   ├── MarkInputRow.tsx       # Student name + mark input + absent toggle
 │   │   ├── GradeBadge.tsx
-│   │   └── ProgressTrendChart.tsx # Line chart using react-native-svg
+│   │   └── ProgressTrendChart.tsx # Line chart using react-native-svg -->
 │   │
-│   ├── announcements/
+<!-- │   ├── announcements/
 │   │   ├── AnnouncementCard.tsx
 │   │   └── EmergencyBanner.tsx    # Red full-width banner for emergency
 │   │
 │   ├── requests/
 │   │   ├── RequestCard.tsx
 │   │   ├── RequestStatusStepper.tsx
-│   │   └── MessageBubble.tsx      # Chat-style thread message
+│   │   └── MessageBubble.tsx      # Chat-style thread message -->
 │   │
-│   ├── notifications/
+<!-- │   ├── notifications/
 │   │   └── NotificationItem.tsx
 │   │
 │   └── child/
 │       ├── ChildSwitcher.tsx      # Horizontal scroll, tap to switch active child
-│       └── ChildSummaryCard.tsx
+│       └── ChildSummaryCard.tsx -->
 │
 <!-- ├── hooks/                        # Custom hooks — one file per concern
 │   ├── useAuth.ts                # Current user, role, logout

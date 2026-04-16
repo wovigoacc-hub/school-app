@@ -115,6 +115,7 @@ export interface TrendDataPoint {
     grade: string | null;
     classRank: number | null;
     classAverage: number | null;
+    isAbsent?: boolean;
 }
 
 // ─── Local mark state (optimistic UI during entry) ───────────────────────────
