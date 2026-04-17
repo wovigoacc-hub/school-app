@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "55461749859",
+    "project_id": "schoolwovigo",
+    "storage_bucket": "schoolwovigo.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:55461749859:android:831ef03d46547e7874c456",
+        "android_client_info": {
+          "package_name": "com.schools"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDB7TeUg7K6u9WNUyI1Anxp6hqwzK0l0Zw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
