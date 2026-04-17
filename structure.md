@@ -31,13 +31,13 @@ src/
 │   │   │   ├── HomeworkDetailScreen.tsx
 │   │   │   ├── HomeworkCreateScreen.tsx
 │   │   │   └── HomeworkSubmissionsScreen.tsx -->
-│   │   ├── marks/
+<!-- │   │   ├── marks/
 │   │   │   ├── ExamListScreen.tsx
 │   │   │   ├── MarkSheetScreen.tsx
-│   │   │   └── MarkEntryScreen.tsx
-│   │   ├── announcements/
+│   │   │   └── MarkEntryScreen.tsx -->
+<!-- │   │   ├── announcements/
 │   │   │   ├── AnnouncementFeedScreen.tsx
-│   │   │   └── AnnouncementCreateScreen.tsx
+│   │   │   └── AnnouncementCreateScreen.tsx -->
 <!-- │   │   ├── requests/
 │   │   │   ├── RequestListScreen.tsx
 │   │   │   └── RequestDetailScreen.tsx -->
@@ -45,23 +45,23 @@ src/
 │   │       └── TeacherProfileScreen.tsx -->
 │   │
 │   └── parent/
-│       ├── home/
+<!-- │       ├── home/
 │       │   └── ParentHomeScreen.tsx   # Child summary cards
 │       ├── attendance/
 │       │   ├── AttendanceCalendarScreen.tsx
-│       │   └── AttendanceSummaryScreen.tsx
-│       ├── homework/
+│       │   └── AttendanceSummaryScreen.tsx -->
+<!-- │       ├── homework/
 │       │   ├── HomeworkFeedScreen.tsx
 │       │   └── HomeworkDetailScreen.tsx
 │       ├── results/
 │       │   ├── ExamListScreen.tsx
-│       │   └── ExamResultScreen.tsx
-│       ├── announcements/
+│       │   └── ExamResultScreen.tsx -->
+<!-- │       ├── announcements/
 │       │   └── AnnouncementFeedScreen.tsx
 │       ├── requests/
 │       │   ├── RequestListScreen.tsx
 │       │   ├── RequestCreateScreen.tsx
-│       │   └── RequestDetailScreen.tsx
+│       │   └── RequestDetailScreen.tsx -->
 │       └── profile/
 │           └── ParentProfileScreen.tsx
 │

@@ -1,0 +1,61 @@
+{
+    "app": {
+        "name": "SchoolBridge",
+        "tagline": "பள்ளியுடன் இணைந்திருங்கள்"
+    },
+    "nav": {
+        "home": "முகப்பு",
+        "attendance": "வருகை",
+        "homework": "வீட்டுப்பாடம்",
+        "marks": "மதிப்பெண்கள்",
+        "results": "முடிவுகள்",
+        "profile": "சுயவிவரம்",
+        "back": "பின்செல்"
+    },
+    "auth": {
+        "login": "உள்நுழை",
+        "logout": "வெளியேறு",
+        "logoutConfirmTitle": "வெளியேற வேண்டுமா?",
+        "logoutConfirmMessage": "நீங்கள் வெளியேற விரும்புகிறீர்களா?",
+        "email": "மின்னஞ்சல்",
+        "password": "கடவுச்சொல்",
+        "teacher": "ஆசிரியர்",
+        "parent": "பெற்றோர்",
+        "iAm": "நான்",
+        "signingIn": "உள்நுழைகிறது…",
+        "changePassword": "கடவுச்சொல் அமைக்கவும்",
+        "changePasswordSubtitle": "தொடர புதிய கடவுச்சொல்லை உருவாக்கவும்."
+    },
+    "greeting": {
+        "morning": "காலை வணக்கம்",
+        "afternoon": "மதிய வணக்கம்",
+        "evening": "மாலை வணக்கம்"
+    },
+    "common": {
+        "loading": "ஏற்றுகிறது…",
+        "save": "சேமி",
+        "cancel": "ரத்து",
+        "confirm": "உறுதிப்படுத்து",
+        "delete": "நீக்கு",
+        "submit": "சமர்ப்பி",
+        "close": "மூடு",
+        "retry": "மீண்டும் முயற்சி",
+        "seeAll": "அனைத்தும் காண்க",
+        "all": "அனைத்தும்",
+        "done": "முடிந்தது"
+    },
+    "attendance": {
+        "statuses": {
+            "PRESENT": "வந்தனர்",
+            "ABSENT": "வரவில்லை",
+            "LATE": "தாமதம்",
+            "LEAVE": "விடுப்பு",
+            "HALF_DAY": "அரை நாள்",
+            "NOT_MARKED": "குறிக்கப்படவில்லை"
+        }
+    },
+    "language": {
+        "title": "மொழி",
+        "hint": "தேதிகள் மற்றும் உரை காட்டும் விதம் மாறும்"
+    }
+}

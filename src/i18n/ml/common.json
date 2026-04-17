@@ -1,0 +1,61 @@
+{
+    "app": {
+        "name": "SchoolBridge",
+        "tagline": "സ്കൂളുമായി ബന്ധിതരായിരിക്കൂ"
+    },
+    "nav": {
+        "home": "ഹോം",
+        "attendance": "ഹാജർ",
+        "homework": "ഗൃഹപാഠം",
+        "marks": "മാർക്ക്",
+        "results": "ഫലങ്ങൾ",
+        "profile": "പ്രൊഫൈൽ",
+        "back": "തിരിക"
+    },
+    "auth": {
+        "login": "സൈൻ ഇൻ",
+        "logout": "സൈൻ ഔട്ട്",
+        "logoutConfirmTitle": "സൈൻ ഔട്ട്",
+        "logoutConfirmMessage": "നിങ്ങൾ സൈൻ ഔട്ട് ചെയ്യാൻ ആഗ്രഹിക്കുന്നുണ്ടോ?",
+        "email": "ഇമെയിൽ",
+        "password": "പാസ്‌വേഡ്",
+        "teacher": "അദ്ധ്യാപകൻ",
+        "parent": "രക്ഷിതാവ്",
+        "iAm": "ഞാൻ",
+        "signingIn": "സൈൻ ഇൻ ചെയ്യുന്നു…",
+        "changePassword": "പാസ്‌വേഡ് സജ്ജമാക്കൂ",
+        "changePasswordSubtitle": "തുടരാൻ പുതിയ പാസ്‌വേഡ് സൃഷ്ടിക്കൂ."
+    },
+    "greeting": {
+        "morning": "സുപ്രഭാതം",
+        "afternoon": "ഉച്ച നമസ്കാരം",
+        "evening": "സന്ധ്യ നമസ്കാരം"
+    },
+    "common": {
+        "loading": "ലോഡ് ചെയ്യുന്നു…",
+        "save": "സേവ് ചെയ്യൂ",
+        "cancel": "റദ്ദാക്കൂ",
+        "confirm": "സ്ഥിരീകരിക്കൂ",
+        "delete": "ഇല്ലാതാക്കൂ",
+        "submit": "സമർപ്പിക്കൂ",
+        "close": "അടയ്ക്കൂ",
+        "retry": "വീണ്ടും ശ്രമിക്കൂ",
+        "seeAll": "എല്ലാം കാണൂ",
+        "all": "എല്ലാം",
+        "done": "പൂർത്തിയായി"
+    },
+    "attendance": {
+        "statuses": {
+            "PRESENT": "ഹാജർ",
+            "ABSENT": "ഗൈർഹാജർ",
+            "LATE": "വൈകി",
+            "LEAVE": "ലീവ്",
+            "HALF_DAY": "അർദ്ധ ദിവസം",
+            "NOT_MARKED": "അടയാളപ്പെടുത്തിയിട്ടില്ല"
+        }
+    },
+    "language": {
+        "title": "ഭാഷ",
+        "hint": "തീയതികളും ടെക്സ്റ്റും കാണിക്കുന്ന രീതി മാറും"
+    }
+}

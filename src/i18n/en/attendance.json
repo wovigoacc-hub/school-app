@@ -1,1 +1,53 @@
-// Auto-generated file
+{
+    "attendance": {
+        "title": "Attendance",
+        "markAttendance": "Mark Attendance",
+        "history": "Attendance History",
+        "calendar": "Attendance Calendar",
+        "summary": "Attendance Summary",
+        "session": "Session",
+        "selectClass": "Select a class to mark attendance",
+        "alreadyMarked": "Attendance already submitted",
+        "unsavedChanges": "You have unsaved changes",
+        "locked": "Attendance is locked",
+        "lockedHint": "Lock time has passed for today",
+        "leaveApproved": "Leave approved — cannot change",
+        "tapToCycle": "Tap to cycle status",
+        "notMarked": "Not Marked",
+        "noAttendance": "No attendance records",
+        "statuses": {
+            "PRESENT": "Present",
+            "ABSENT": "Absent",
+            "LATE": "Late",
+            "LEAVE": "Leave",
+            "HALF_DAY": "Half Day",
+            "NOT_MARKED": "Not Marked"
+        },
+        "confirm": {
+            "title": "Confirm Submission",
+            "message_one": "{{count}} student will be marked absent. Proceed?",
+            "message_other": "{{count}} students will be marked absent. Proceed?",
+            "submit": "Submit",
+            "cancel": "Cancel"
+        },
+        "submit": "Submit",
+        "resubmit": "Re-submit",
+        "update": "Update",
+        "submitted": "Attendance submitted successfully",
+        "threshold": {
+            "warning": "Below {{pct}}% minimum attendance",
+            "critical": "Critically low attendance"
+        },
+        "stats": {
+            "overall": "Overall",
+            "schoolDays": "{{count}} school day",
+            "schoolDays_plural": "{{count}} school days",
+            "presentPct": "{{pct}}% present"
+        },
+        "weekend": "Weekend",
+        "mode": {
+            "ONCE_DAILY": "Once daily",
+            "PERIOD_WISE": "Period-wise"
+        }
+    }
+}

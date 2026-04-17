@@ -1,5 +1,16 @@
 import type { NavigatorScreenParams } from '@react-navigation/native';
 
+export type MarkSheetParams = {
+    examId: string;
+    examName: string;
+    subjectId: string;
+    subjectName: string;
+    classId: string;
+    className: string;
+    section: string;
+    maxMarks: number;
+};
+
 // ─── Auth stack ───────────────────────────────────────────────────────────────
 
 export type AuthStackParamList = {
@@ -49,16 +60,8 @@ export type TeacherNavigatorParamList = {
 
     // ── Marks ─────────────────────────────────────────────────────────────────
     ExamList: undefined;
-    MarkSheet: {
-        examId: string;
-        examName: string;
-        subjectId: string;
-        subjectName: string;
-        classId: string;
-        className: string;
-        section: string;
-        maxMarks: number;
-    };
+    MarkSheet: MarkSheetParams;
+    MarkEntry: MarkSheetParams;
     Marks: { examId: string };
 
     // ── Announcements ─────────────────────────────────────────────────────────
@@ -81,9 +84,9 @@ export type TeacherNavigatorParamList = {
 
 export type ParentTabParamList = {
     HomeTab: undefined;
-    AttendanceTab: undefined;
-    HomeworkTab: undefined;
-    ResultsTab: undefined;
+    AttendanceTab: { studentId: string };
+    HomeworkTab: { studentId?: string } | undefined;
+    ResultsTab: { studentId: string };
     ProfileTab: undefined;
 };
 
@@ -139,7 +142,7 @@ export type RootStackParamList = {
 export type AttendanceMarkParams = TeacherNavigatorParamList['AttendanceMark'];
 export type AttendanceHistoryParams = TeacherNavigatorParamList['AttendanceHistory'];
 export type HomeworkDetailTeacherParams = TeacherNavigatorParamList['HomeworkDetail'];
-export type MarkSheetParams = TeacherNavigatorParamList['MarkSheet'];
+// export type MarkSheetParams = TeacherNavigatorParamList['MarkSheet'];
 export type AnnouncementDetailParams = TeacherNavigatorParamList['AnnouncementDetail'];
 export type RequestDetailTeacherParams = TeacherNavigatorParamList['RequestDetail'];
 export type HomeworkDetailParentParams = ParentNavigatorParamList['HomeworkDetail'];

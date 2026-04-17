@@ -1,1 +1,143 @@
-// Auto-generated file
+{
+    "app": {
+        "name": "SchoolBridge",
+        "tagline": "Stay connected with school"
+    },
+    "nav": {
+        "home": "Home",
+        "attendance": "Attendance",
+        "homework": "Homework",
+        "marks": "Marks",
+        "results": "Results",
+        "profile": "Profile",
+        "back": "Back"
+    },
+    "auth": {
+        "login": "Sign In",
+        "logout": "Sign Out",
+        "logoutConfirmTitle": "Sign Out",
+        "logoutConfirmMessage": "Are you sure you want to sign out?",
+        "loggingOut": "Signing out…",
+        "email": "Email",
+        "password": "Password",
+        "teacher": "Teacher",
+        "parent": "Parent",
+        "iAm": "I am a",
+        "signingIn": "Signing in…",
+        "noAccount": "Having trouble logging in?\nContact your school administrator.",
+        "changePassword": "Set Your Password",
+        "changePasswordSubtitle": "Please create a new password to continue.",
+        "currentPassword": "Temporary password",
+        "currentPasswordHint": "The password sent to you by your school",
+        "newPassword": "New password",
+        "confirmPassword": "Confirm new password",
+        "saving": "Saving…",
+        "setAndContinue": "Set Password & Continue",
+        "mustSetPassword": "For your security, you must set a personal password before using the app.",
+        "passwordStrength": {
+            "weak": "Weak",
+            "fair": "Fair",
+            "good": "Good",
+            "strong": "Strong"
+        },
+        "passwordChecks": {
+            "length": "At least 8 characters",
+            "uppercase": "Uppercase letter",
+            "lowercase": "Lowercase letter",
+            "number": "Number"
+        }
+    },
+    "greeting": {
+        "morning": "Good morning",
+        "afternoon": "Good afternoon",
+        "evening": "Good evening"
+    },
+    "common": {
+        "loading": "Loading…",
+        "save": "Save",
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "delete": "Delete",
+        "edit": "Edit",
+        "create": "Create",
+        "submit": "Submit",
+        "close": "Close",
+        "retry": "Try Again",
+        "seeAll": "See all",
+        "markAllRead": "Mark all read",
+        "new": "+ New",
+        "refresh": "Refresh",
+        "search": "Search",
+        "filter": "Filter",
+        "all": "All",
+        "none": "None",
+        "yes": "Yes",
+        "no": "No",
+        "ok": "OK",
+        "done": "Done",
+        "optional": "optional",
+        "required": "required",
+        "or": "or"
+    },
+    "errors": {
+        "generic": "Something went wrong. Please try again.",
+        "network": "Check your internet connection and try again.",
+        "unauthorized": "Your session has expired. Please sign in again.",
+        "notFound": "This item could not be found.",
+        "serverError": "Server error. Please try again later.",
+        "screenTitle": "Something went wrong",
+        "screenMessage": "An unexpected error occurred.",
+        "contactSupport": "Please try again or contact support if it persists."
+    },
+    "offline": {
+        "banner": "You're offline",
+        "savedOffline": "Saved offline. Will sync when you're back online.",
+        "requiresConnection": "This action requires a connection.",
+        "syncingCount": "Syncing {{count}} offline action…",
+        "syncingCount_plural": "Syncing {{count}} offline actions…",
+        "synced": "{{count}} action synced",
+        "synced_plural": "{{count}} actions synced",
+        "syncFailed": "{{success}} synced, {{failed}} failed — will retry",
+        "noConnection": "No connection",
+        "noConnectionMessage": "Check your internet connection and try again."
+    },
+    "empty": {
+        "attendance": "No attendance records",
+        "attendanceMessage": "Attendance data will appear here once sessions are marked.",
+        "homework": "No homework",
+        "homeworkMessage": "Homework will appear here.",
+        "results": "No results yet",
+        "resultsMessage": "Exam results will appear here once published.",
+        "announcements": "No announcements",
+        "announcementsMessage": "School announcements will appear here.",
+        "requests": "No requests",
+        "requestsMessage": "Requests will appear here.",
+        "notifications": "No notifications",
+        "notificationsMessage": "You're all caught up!",
+        "search": "No results found",
+        "searchMessage": "Try adjusting your search or filters."
+    },
+    "validation": {
+        "required": "This field is required",
+        "invalidEmail": "Enter a valid email address",
+        "passwordTooShort": "Password must be at least 8 characters",
+        "passwordWeak": "Password must include uppercase, lowercase, and a number",
+        "passwordsNoMatch": "Passwords do not match",
+        "nameTooShort": "Name must be at least 2 characters",
+        "invalidPhone": "Enter a valid 10-digit mobile number",
+        "maxLength": "Must be {{max}} characters or fewer",
+        "invalidMark": "Enter a valid number",
+        "markTooHigh": "Cannot exceed maximum marks ({{max}})",
+        "markNegative": "Marks cannot be negative",
+        "selectClass": "Select a class",
+        "selectSubject": "Select a subject",
+        "selectClasses": "Please select at least one class"
+    },
+    "language": {
+        "title": "Language",
+        "hint": "Changes how dates and text appear throughout the app",
+        "english": "English",
+        "tamil": "தமிழ்",
+        "malayalam": "മലയാളം"
+    }
+}
