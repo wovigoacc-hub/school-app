@@ -8,7 +8,7 @@ export const teacherStudentsApi = api.injectEndpoints({
         // ─── Class roster (for attendance + marks) ───────────────────────────────
         getClassRoster: builder.query<ApiResponse<StudentSummary[]>, string>({
             query: (classId) => ({
-                url: `/v1/mobile/teacher/students/class/${classId}`,
+                url: `/mobile/teacher/students/class/${classId}`,
             }),
             providesTags: (result, error, classId) => [
                 { type: 'TeacherStudents', id: classId },
@@ -21,7 +21,7 @@ export const teacherStudentsApi = api.injectEndpoints({
             string
         >({
             query: (studentId) => ({
-                url: `/v1/mobile/teacher/students/${studentId}/academic-summary`,
+                url: `/mobile/teacher/students/${studentId}/academic-summary`,
             }),
         }),
     }),

@@ -26,7 +26,7 @@ export const teacherHomeworkApi = api.injectEndpoints({
             HomeworkQueryParams
         >({
             query: (params) => ({
-                url: '/v1/mobile/teacher/homework',
+                url: '/mobile/teacher/homework',
                 params,
             }),
             providesTags: (result) =>
@@ -43,7 +43,7 @@ export const teacherHomeworkApi = api.injectEndpoints({
 
         // ─── Get homework detail with submissions ────────────────────────────────
         getHomeworkDetail: builder.query<ApiResponse<HomeworkDetail>, string>({
-            query: (id) => ({ url: `/v1/mobile/teacher/homework/${id}` }),
+            query: (id) => ({ url: `/mobile/teacher/homework/${id}` }),
             providesTags: (result, error, id) => [{ type: 'HomeworkDetail', id }],
         }),
 
@@ -53,7 +53,7 @@ export const teacherHomeworkApi = api.injectEndpoints({
             CreateHomeworkRequest
         >({
             query: (body) => ({
-                url: '/v1/mobile/teacher/homework',
+                url: '/mobile/teacher/homework',
                 method: 'POST',
                 body,
             }),
@@ -66,7 +66,7 @@ export const teacherHomeworkApi = api.injectEndpoints({
             { id: string; body: UpdateHomeworkRequest }
         >({
             query: ({ id, body }) => ({
-                url: `/v1/mobile/teacher/homework/${id}`,
+                url: `/mobile/teacher/homework/${id}`,
                 method: 'PATCH',
                 body,
             }),
@@ -79,7 +79,7 @@ export const teacherHomeworkApi = api.injectEndpoints({
         // ─── Delete homework ─────────────────────────────────────────────────────
         deleteHomework: builder.mutation<ApiResponse<null>, string>({
             query: (id) => ({
-                url: `/v1/mobile/teacher/homework/${id}`,
+                url: `/mobile/teacher/homework/${id}`,
                 method: 'DELETE',
             }),
             invalidatesTags: (result, error, id) => [
@@ -95,7 +95,7 @@ export const teacherHomeworkApi = api.injectEndpoints({
             { homeworkId: string; body: MarkSubmissionRequest }
         >({
             query: ({ homeworkId, body }) => ({
-                url: `/v1/mobile/teacher/homework/${homeworkId}/submission`,
+                url: `/mobile/teacher/homework/${homeworkId}/submission`,
                 method: 'PATCH',
                 body,
             }),
@@ -110,7 +110,7 @@ export const teacherHomeworkApi = api.injectEndpoints({
             { homeworkId: string; body: BatchMarkSubmissionsRequest }
         >({
             query: ({ homeworkId, body }) => ({
-                url: `/v1/mobile/teacher/homework/${homeworkId}/submissions/batch`,
+                url: `/mobile/teacher/homework/${homeworkId}/submissions/batch`,
                 method: 'PATCH',
                 body,
             }),
@@ -126,7 +126,7 @@ export const teacherHomeworkApi = api.injectEndpoints({
             { homeworkId: string; body: GradeSubmissionRequest }
         >({
             query: ({ homeworkId, body }) => ({
-                url: `/v1/mobile/teacher/homework/${homeworkId}/grade`,
+                url: `/mobile/teacher/homework/${homeworkId}/grade`,
                 method: 'PATCH',
                 body,
             }),

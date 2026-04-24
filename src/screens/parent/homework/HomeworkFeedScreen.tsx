@@ -10,6 +10,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ScreenWrapper } from '../../../components/layout/ScreenWrapper';
 import { SectionHeader } from '../../../components/layout/SectionHeader';
 import { AppChip } from '../../../components/common/AppChip';
+import { AppText } from '../../../components/common/AppText';
 import { AppRefreshControl, useRefresh } from '../../../components/common/AppRefreshControl';
 import { PresetEmptyState } from '../../../components/common/AppEmptyState';
 import { SkeletonCard } from '../../../components/common/AppSkeleton';

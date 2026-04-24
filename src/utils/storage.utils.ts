@@ -1,5 +1,5 @@
 import * as Keychain from 'react-native-keychain';
-import { MMKV } from 'react-native-mmkv';
+import { createMMKV } from 'react-native-mmkv';
 import type { StoredTokens } from '../types/auth.types';
 
 // ─── Keychain service name ─────────────────────────────────────────────────────
@@ -12,7 +12,7 @@ const KEYCHAIN_SERVICE = 'com.schoolbridge.auth';
 // Used for: offline queue, active child ID, UI preferences
 // NOT for tokens — those go in Keychain
 
-export const mmkv = new MMKV({
+export const mmkv = createMMKV({
     id: 'schoolbridge-store',
     encryptionKey: 'sb-mmkv-key-2025', // static key — non-sensitive data only
 });
@@ -51,7 +51,7 @@ export async function getTokens(): Promise<StoredTokens | null> {
             service: KEYCHAIN_SERVICE,
         });
 
-        if (!result || result === false) return null;
+        if (!result) return null;
 
         const parsed = JSON.parse(result.password) as StoredTokens;
         return parsed;
@@ -116,7 +116,7 @@ export function getActiveChildId(): string | undefined {
 }
 
 export function clearActiveChildId(): void {
-    mmkv.delete(MMKV_KEYS.ACTIVE_CHILD_ID);
+    mmkv.remove(MMKV_KEYS.ACTIVE_CHILD_ID);
 }
 
 // Preferred language (mirrors DB value — used before profile loads)
@@ -175,7 +175,7 @@ export function removeFromOfflineQueue(id: string): void {
 }
 
 export function clearOfflineQueue(): void {
-    mmkv.delete(MMKV_KEYS.OFFLINE_QUEUE);
+    mmkv.remove(MMKV_KEYS.OFFLINE_QUEUE);
 }
 
 // Onboarding flag
@@ -197,7 +197,7 @@ export function isOnboarded(): boolean {
 export async function clearAllAuthStorage(): Promise<void> {
     await clearTokens();
     clearActiveChildId();
-    mmkv.delete(MMKV_KEYS.PREFERRED_LANG);
-    mmkv.delete(MMKV_KEYS.LAST_SYNC);
+    mmkv.remove(MMKV_KEYS.PREFERRED_LANG);
+    mmkv.remove(MMKV_KEYS.LAST_SYNC);
     // Push token is intentionally kept — no need to re-register on next login
 }

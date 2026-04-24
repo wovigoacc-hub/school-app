@@ -20,7 +20,7 @@ export const parentHomeworkApi = api.injectEndpoints({
             { studentId: string; params?: HomeworkFeedParams }
         >({
             query: ({ studentId, params }) => ({
-                url: `/v1/mobile/parent/students/${studentId}/homework`,
+                url: `/mobile/parent/students/${studentId}/homework`,
                 params,
             }),
             providesTags: (result, error, { studentId }) => [
@@ -35,7 +35,7 @@ export const parentHomeworkApi = api.injectEndpoints({
             { studentId: string; homeworkId: string }
         >({
             query: ({ studentId, homeworkId }) => ({
-                url: `/v1/mobile/parent/students/${studentId}/homework/${homeworkId}/submit`,
+                url: `/mobile/parent/students/${studentId}/homework/${homeworkId}/submit`,
                 method: 'POST',
                 body: {},
             }),

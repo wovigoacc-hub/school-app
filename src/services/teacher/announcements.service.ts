@@ -25,7 +25,7 @@ export const teacherAnnouncementsApi = api.injectEndpoints({
             AnnouncementFeedParams
         >({
             query: (params) => ({
-                url: '/v1/mobile/teacher/announcements',
+                url: '/mobile/teacher/announcements',
                 params,
             }),
             providesTags: (result) =>
@@ -45,13 +45,13 @@ export const teacherAnnouncementsApi = api.injectEndpoints({
             ApiResponse<{ unreadCount: number }>,
             void
         >({
-            query: () => ({ url: '/v1/mobile/teacher/announcements/unread-count' }),
+            query: () => ({ url: '/mobile/teacher/announcements/unread-count' }),
             providesTags: ['UnreadAnnouncementCount'],
         }),
 
         // ─── Get single announcement ─────────────────────────────────────────────
         getTeacherAnnouncement: builder.query<ApiResponse<Announcement>, string>({
-            query: (id) => ({ url: `/v1/mobile/teacher/announcements/${id}` }),
+            query: (id) => ({ url: `/mobile/teacher/announcements/${id}` }),
             providesTags: (result, error, id) => [{ type: 'AnnouncementItem', id }],
         }),
 
@@ -61,7 +61,7 @@ export const teacherAnnouncementsApi = api.injectEndpoints({
             CreateAnnouncementRequest
         >({
             query: (body) => ({
-                url: '/v1/mobile/teacher/announcements',
+                url: '/mobile/teacher/announcements',
                 method: 'POST',
                 body,
             }),
@@ -77,7 +77,7 @@ export const teacherAnnouncementsApi = api.injectEndpoints({
             MarkReadRequest
         >({
             query: (body) => ({
-                url: '/v1/mobile/teacher/announcements/mark-read',
+                url: '/mobile/teacher/announcements/mark-read',
                 method: 'POST',
                 body,
             }),
@@ -96,7 +96,7 @@ export const teacherAnnouncementsApi = api.injectEndpoints({
             { id: string; body: UpdateAnnouncementRequest }
         >({
             query: ({ id, body }) => ({
-                url: `/v1/mobile/teacher/announcements/${id}`,
+                url: `/mobile/teacher/announcements/${id}`,
                 method: 'PATCH',
                 body,
             }),

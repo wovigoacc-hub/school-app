@@ -8,17 +8,24 @@ function base64UrlDecode(str: string): string {
     // Replace URL-safe chars and add padding
     const base64 = str
         .replace(/-/g, '+')
-        .replace(/_/g, '/')
-        .padEnd(str.length + ((4 - (str.length % 4)) % 4), '=');
+        .replace(/_/g, '/');
 
-    // atob is available in React Native's Hermes/JSC environments
-    // For older RN versions, use Buffer if atob is unavailable
-    if (typeof atob !== 'undefined') {
-        return atob(base64);
+    // Pure JS base64 decode (bulletproof for React Native)
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+    let output = '';
+
+    const input = base64.replace(/=+$/, '');
+
+    for (let bc = 0, bs = 0, buffer, i = 0; (buffer = input.charAt(i++)); ~buffer && ((bs = bc % 4 ? bs * 64 + buffer : buffer), bc++ % 4) ? (output += String.fromCharCode(255 & (bs >> ((-2 * bc) & 6)))) : 0) {
+        buffer = chars.indexOf(buffer);
     }
 
-    // Fallback using Buffer (Node.js / older RN)
-    return Buffer.from(base64, 'base64').toString('utf-8');
+    return decodeURIComponent(
+        output
+            .split('')
+            .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+            .join(''),
+    );
 }
 
 /**

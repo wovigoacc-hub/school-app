@@ -3,7 +3,8 @@ import messaging, {
     type FirebaseMessagingTypes,
 } from '@react-native-firebase/messaging';
 import { Platform, AppState, type AppStateStatus } from 'react-native';
-import { useAppDispatch } from '../app/store';
+import { useAppDispatch, useAppSelector } from '../app/store';
+import { selectIsAuthenticated, selectUserId } from '../store/slices/authSlice';
 import { showToast } from '../store/slices/uiSlice';
 import {
     setCachedPushToken,
@@ -24,7 +25,8 @@ type NavigationRef = {
 
 export function useNotifications(navigationRef?: React.RefObject<NavigationRef>) {
     const dispatch = useAppDispatch();
-    const { isAuthenticated, userId } = useAuth();
+    const isAuthenticated = useAppSelector(selectIsAuthenticated);
+    const userId = useAppSelector(selectUserId);
     const [registerToken] = useRegisterDeviceTokenMutation();
     const tokenRegisteredRef = useRef(false);
 
@@ -169,8 +171,4 @@ export function useNotifications(navigationRef?: React.RefObject<NavigationRef>)
     }, [handleForegroundMessage, navigateFromNotification, registerFcmToken]);
 
     return { requestPermission, registerFcmToken };
-}
-
-function useAuth(): { isAuthenticated: any; userId: any; } {
-    throw new Error('Function not implemented.');
 }

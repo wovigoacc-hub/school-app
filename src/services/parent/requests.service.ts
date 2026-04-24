@@ -25,7 +25,7 @@ export const parentRequestsApi = api.injectEndpoints({
             RequestQueryParams
         >({
             query: (params) => ({
-                url: '/v1/mobile/parent/requests',
+                url: '/mobile/parent/requests',
                 params,
             }),
             providesTags: (result) =>
@@ -45,7 +45,7 @@ export const parentRequestsApi = api.injectEndpoints({
             ApiResponse<ParentRequestDetail>,
             string
         >({
-            query: (id) => ({ url: `/v1/mobile/parent/requests/${id}` }),
+            query: (id) => ({ url: `/mobile/parent/requests/${id}` }),
             providesTags: (result, error, id) => [{ type: 'RequestDetail', id }],
         }),
 
@@ -55,7 +55,7 @@ export const parentRequestsApi = api.injectEndpoints({
             CreateRequestRequest
         >({
             query: (body) => ({
-                url: '/v1/mobile/parent/requests',
+                url: '/mobile/parent/requests',
                 method: 'POST',
                 body,
             }),
@@ -68,7 +68,7 @@ export const parentRequestsApi = api.injectEndpoints({
             { requestId: string; body: AddMessageRequest }
         >({
             query: ({ requestId, body }) => ({
-                url: `/v1/mobile/parent/requests/${requestId}/messages`,
+                url: `/mobile/parent/requests/${requestId}/messages`,
                 method: 'POST',
                 body,
             }),
@@ -80,7 +80,7 @@ export const parentRequestsApi = api.injectEndpoints({
         // ─── Close own request ───────────────────────────────────────────────────
         closeParentRequest: builder.mutation<ApiResponse<null>, string>({
             query: (requestId) => ({
-                url: `/v1/mobile/parent/requests/${requestId}/close`,
+                url: `/mobile/parent/requests/${requestId}/close`,
                 method: 'PATCH',
             }),
             invalidatesTags: (result, error, requestId) => [

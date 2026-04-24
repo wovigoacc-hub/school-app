@@ -15,7 +15,7 @@ export const authApi = api.injectEndpoints({
         // ─── Login (teacher) ────────────────────────────────────────────────────
         teacherLogin: builder.mutation<ApiResponse<LoginResponse>, LoginRequest>({
             query: (body) => ({
-                url: '/v1/auth/teacher/login',
+                url: '/auth/teacher/login',
                 method: 'POST',
                 body,
             }),
@@ -24,7 +24,7 @@ export const authApi = api.injectEndpoints({
         // ─── Login (parent) ─────────────────────────────────────────────────────
         parentLogin: builder.mutation<ApiResponse<LoginResponse>, LoginRequest>({
             query: (body) => ({
-                url: '/v1/auth/parent/login',
+                url: '/auth/parent/login',
                 method: 'POST',
                 body,
             }),
@@ -33,7 +33,7 @@ export const authApi = api.injectEndpoints({
         // ─── Change password (first login + voluntary) ───────────────────────────
         changePassword: builder.mutation<ApiResponse<null>, ChangePasswordRequest>({
             query: (body) => ({
-                url: '/v1/auth/change-password',
+                url: '/auth/change-password',
                 method: 'POST',
                 body,
             }),
@@ -42,7 +42,7 @@ export const authApi = api.injectEndpoints({
         // ─── Refresh token ──────────────────────────────────────────────────────
         refreshToken: builder.mutation<RefreshTokenResponse, RefreshTokenRequest>({
             query: (body) => ({
-                url: '/v1/auth/refresh',
+                url: '/auth/refresh',
                 method: 'POST',
                 body,
             }),
@@ -51,7 +51,7 @@ export const authApi = api.injectEndpoints({
         // ─── Logout ─────────────────────────────────────────────────────────────
         logout: builder.mutation<ApiResponse<null>, { refreshToken: string }>({
             query: (body) => ({
-                url: '/v1/auth/logout',
+                url: '/auth/logout',
                 method: 'POST',
                 body,
             }),
@@ -60,7 +60,7 @@ export const authApi = api.injectEndpoints({
         // ─── Register FCM device token ───────────────────────────────────────────
         registerDeviceToken: builder.mutation<ApiResponse<null>, RegisterDeviceTokenRequest>({
             query: (body) => ({
-                url: '/v1/auth/device-token',
+                url: '/auth/device-token',
                 method: 'POST',
                 body,
             }),
@@ -69,7 +69,7 @@ export const authApi = api.injectEndpoints({
         // ─── Remove device token (on logout) ────────────────────────────────────
         removeDeviceToken: builder.mutation<ApiResponse<null>, { token: string }>({
             query: (body) => ({
-                url: '/v1/auth/device-token',
+                url: '/auth/device-token',
                 method: 'DELETE',
                 body,
             }),

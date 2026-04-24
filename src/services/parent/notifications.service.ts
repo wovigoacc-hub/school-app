@@ -25,7 +25,7 @@ export const parentNotificationsApi = api.injectEndpoints({
             NotificationQueryParams
         >({
             query: (params) => ({
-                url: '/v1/mobile/parent/notifications',
+                url: '/mobile/parent/notifications',
                 params,
             }),
             providesTags: ['NotificationInbox'],
@@ -37,7 +37,7 @@ export const parentNotificationsApi = api.injectEndpoints({
             void
         >({
             query: () => ({
-                url: '/v1/mobile/parent/notifications/unread-count',
+                url: '/mobile/parent/notifications/unread-count',
             }),
             providesTags: ['UnreadNotificationCount'],
         }),
@@ -48,7 +48,7 @@ export const parentNotificationsApi = api.injectEndpoints({
             MarkDeliveredRequest
         >({
             query: (body) => ({
-                url: '/v1/mobile/parent/notifications/mark-delivered',
+                url: '/mobile/parent/notifications/mark-delivered',
                 method: 'PATCH',
                 body,
             }),
@@ -61,7 +61,7 @@ export const parentNotificationsApi = api.injectEndpoints({
             void
         >({
             query: () => ({
-                url: '/v1/mobile/parent/notifications/mark-all-delivered',
+                url: '/mobile/parent/notifications/mark-all-delivered',
                 method: 'PATCH',
             }),
             invalidatesTags: ['NotificationInbox', 'UnreadNotificationCount'],
@@ -80,7 +80,7 @@ export const teacherNotificationsApi = api.injectEndpoints({
             NotificationQueryParams
         >({
             query: (params) => ({
-                url: '/v1/mobile/teacher/notifications',
+                url: '/mobile/teacher/notifications',
                 params,
             }),
             providesTags: ['NotificationInbox'],
@@ -91,7 +91,7 @@ export const teacherNotificationsApi = api.injectEndpoints({
             void
         >({
             query: () => ({
-                url: '/v1/mobile/teacher/notifications/unread-count',
+                url: '/mobile/teacher/notifications/unread-count',
             }),
             providesTags: ['UnreadNotificationCount'],
         }),
@@ -101,7 +101,7 @@ export const teacherNotificationsApi = api.injectEndpoints({
             MarkDeliveredRequest
         >({
             query: (body) => ({
-                url: '/v1/mobile/teacher/notifications/mark-delivered',
+                url: '/mobile/teacher/notifications/mark-delivered',
                 method: 'PATCH',
                 body,
             }),
@@ -113,7 +113,7 @@ export const teacherNotificationsApi = api.injectEndpoints({
             void
         >({
             query: () => ({
-                url: '/v1/mobile/teacher/notifications/mark-all-delivered',
+                url: '/mobile/teacher/notifications/mark-all-delivered',
                 method: 'PATCH',
             }),
             invalidatesTags: ['NotificationInbox', 'UnreadNotificationCount'],

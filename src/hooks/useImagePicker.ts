@@ -49,7 +49,7 @@ export function useImagePicker(): UseImagePickerReturn {
                 mediaType: 'photo' as const,
                 maxWidth: 2048,
                 maxHeight: 2048,
-                quality: 0.85 as const,
+                quality: 0.8 as const,
                 includeBase64: false,
             };
 

@@ -9,14 +9,14 @@ export const teacherClassesApi = api.injectEndpoints({
 
         // ─── My assigned classes (home screen class list + attendance picker) ────
         getMyClasses: builder.query<ApiResponse<TeacherClass[]>, void>({
-            query: () => ({ url: '/v1/mobile/teacher/classes' }),
+            query: () => ({ url: '/mobile/teacher/classes' }),
             providesTags: ['TeacherClasses'],
         }),
 
         // ─── Students in a class (attendance mark sheet roster) ─────────────────
         getClassStudents: builder.query<ApiResponse<StudentSummary[]>, string>({
             query: (classId) => ({
-                url: `/v1/mobile/teacher/students/class/${classId}`,
+                url: `/mobile/teacher/students/class/${classId}`,
             }),
             providesTags: (result, error, classId) => [
                 { type: 'TeacherStudents', id: classId },
@@ -25,7 +25,7 @@ export const teacherClassesApi = api.injectEndpoints({
 
         // ─── My subjects (mark entry + homework subject picker) ──────────────────
         getMySubjects: builder.query<ApiResponse<TeacherSubject[]>, void>({
-            query: () => ({ url: '/v1/mobile/teacher/subjects' }),
+            query: () => ({ url: '/mobile/teacher/subjects' }),
             providesTags: ['TeacherSubjects'],
         }),
 
@@ -35,7 +35,7 @@ export const teacherClassesApi = api.injectEndpoints({
             string
         >({
             query: (studentId) => ({
-                url: `/v1/mobile/teacher/students/${studentId}/academic-summary`,
+                url: `/mobile/teacher/students/${studentId}/academic-summary`,
             }),
         }),
     }),

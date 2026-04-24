@@ -16,7 +16,7 @@ export const teacherMarksApi = api.injectEndpoints({
             { examId: string; subjectId: string; classId: string }
         >({
             query: ({ examId, subjectId, classId }) => ({
-                url: '/v1/mobile/teacher/marks/sheet',
+                url: '/mobile/teacher/marks/sheet',
                 params: { examId, subjectId, classId },
             }),
             providesTags: (result, error, { examId, subjectId, classId }) => [
@@ -33,7 +33,7 @@ export const teacherMarksApi = api.injectEndpoints({
             SubmitMarksRequest
         >({
             query: (body) => ({
-                url: '/v1/mobile/teacher/marks',
+                url: '/mobile/teacher/marks',
                 method: 'POST',
                 body,
             }),
@@ -52,7 +52,7 @@ export const teacherMarksApi = api.injectEndpoints({
             string
         >({
             query: (studentId) => ({
-                url: `/v1/mobile/teacher/marks/student/${studentId}/progress`,
+                url: `/mobile/teacher/marks/student/${studentId}/progress`,
             }),
             providesTags: (result, error, studentId) => [
                 { type: 'ProgressTrend', id: studentId },

@@ -14,7 +14,7 @@ export const parentAttendanceApi = api.injectEndpoints({
             string
         >({
             query: (studentId) => ({
-                url: `/v1/mobile/parent/students/${studentId}/attendance/today`,
+                url: `/mobile/parent/students/${studentId}/attendance/today`,
             }),
             providesTags: (result, error, studentId) => [
                 { type: 'ChildAttendance', id: `today-${studentId}` },
@@ -27,7 +27,7 @@ export const parentAttendanceApi = api.injectEndpoints({
             { studentId: string; from?: string; to?: string }
         >({
             query: ({ studentId, from, to }) => ({
-                url: `/v1/mobile/parent/students/${studentId}/attendance`,
+                url: `/mobile/parent/students/${studentId}/attendance`,
                 params: {
                     ...(from && { from }),
                     ...(to && { to }),

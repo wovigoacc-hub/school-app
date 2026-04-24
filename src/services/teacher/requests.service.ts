@@ -28,7 +28,7 @@ export const teacherRequestsApi = api.injectEndpoints({
             RequestQueryParams
         >({
             query: (params) => ({
-                url: '/v1/mobile/teacher/requests',
+                url: '/mobile/teacher/requests',
                 params,
             }),
             providesTags: (result) =>
@@ -48,7 +48,7 @@ export const teacherRequestsApi = api.injectEndpoints({
             ApiResponse<ParentRequestDetail>,
             string
         >({
-            query: (id) => ({ url: `/v1/mobile/teacher/requests/${id}` }),
+            query: (id) => ({ url: `/mobile/teacher/requests/${id}` }),
             providesTags: (result, error, id) => [{ type: 'RequestDetail', id }],
         }),
 
@@ -58,7 +58,7 @@ export const teacherRequestsApi = api.injectEndpoints({
             { requestId: string; body: AddMessageRequest }
         >({
             query: ({ requestId, body }) => ({
-                url: `/v1/mobile/teacher/requests/${requestId}/messages`,
+                url: `/mobile/teacher/requests/${requestId}/messages`,
                 method: 'POST',
                 body,
             }),
@@ -74,7 +74,7 @@ export const teacherRequestsApi = api.injectEndpoints({
             { requestId: string; body: { status: string; note?: string } }
         >({
             query: ({ requestId, body }) => ({
-                url: `/v1/mobile/teacher/requests/${requestId}/status`,
+                url: `/mobile/teacher/requests/${requestId}/status`,
                 method: 'PATCH',
                 body,
             }),

@@ -15,7 +15,7 @@ export const teacherAttendanceApi = api.injectEndpoints({
             { classId: string; date: string; subjectId?: string }
         >({
             query: ({ classId, date, subjectId }) => ({
-                url: '/v1/mobile/teacher/attendance/session',
+                url: '/mobile/teacher/attendance/session',
                 params: { classId, date, ...(subjectId && { subjectId }) },
             }),
             providesTags: (result, error, { classId, date, subjectId }) => [
@@ -32,7 +32,7 @@ export const teacherAttendanceApi = api.injectEndpoints({
             SubmitAttendanceRequest
         >({
             query: (body) => ({
-                url: '/v1/mobile/teacher/attendance',
+                url: '/mobile/teacher/attendance',
                 method: 'POST',
                 body,
             }),
@@ -52,7 +52,7 @@ export const teacherAttendanceApi = api.injectEndpoints({
             CorrectionRequest
         >({
             query: (body) => ({
-                url: '/v1/mobile/teacher/attendance/correction',
+                url: '/mobile/teacher/attendance/correction',
                 method: 'POST',
                 body,
             }),

@@ -7,7 +7,7 @@ export const teacherExamsApi = api.injectEndpoints({
 
         // ─── Open exams (mark entry window active, within teacher's assignments) ─
         getOpenExams: builder.query<ApiResponse<TeacherOpenExam[]>, void>({
-            query: () => ({ url: '/v1/mobile/teacher/exams' }),
+            query: () => ({ url: '/mobile/teacher/exams' }),
             providesTags: ['ExamList'],
         }),
     }),

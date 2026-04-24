@@ -5,7 +5,7 @@ import {
     type ViewStyle,
     type StyleProp,
 } from 'react-native';
-import FastImage from 'react-native-fast-image';
+import FastImage from '@d11/react-native-fast-image';
 import { AppText } from './AppText';
 import { Colors } from '../../constants/colors';
 import { AvatarSize, BorderRadius, type AvatarSizeKey } from '../../constants/spacing';

@@ -24,7 +24,7 @@ export const parentAnnouncementsApi = api.injectEndpoints({
             AnnouncementFeedParams
         >({
             query: (params) => ({
-                url: '/v1/mobile/parent/announcements',
+                url: '/mobile/parent/announcements',
                 params,
             }),
             providesTags: (result) =>
@@ -44,13 +44,13 @@ export const parentAnnouncementsApi = api.injectEndpoints({
             ApiResponse<{ unreadCount: number }>,
             void
         >({
-            query: () => ({ url: '/v1/mobile/parent/announcements/unread-count' }),
+            query: () => ({ url: '/mobile/parent/announcements/unread-count' }),
             providesTags: ['UnreadAnnouncementCount'],
         }),
 
         // ─── Single announcement ─────────────────────────────────────────────────
         getParentAnnouncement: builder.query<ApiResponse<Announcement>, string>({
-            query: (id) => ({ url: `/v1/mobile/parent/announcements/${id}` }),
+            query: (id) => ({ url: `/mobile/parent/announcements/${id}` }),
             providesTags: (result, error, id) => [{ type: 'AnnouncementItem', id }],
         }),
 
@@ -60,7 +60,7 @@ export const parentAnnouncementsApi = api.injectEndpoints({
             MarkReadRequest
         >({
             query: (body) => ({
-                url: '/v1/mobile/parent/announcements/mark-read',
+                url: '/mobile/parent/announcements/mark-read',
                 method: 'POST',
                 body,
             }),
@@ -80,7 +80,7 @@ export const parentAnnouncementsApi = api.injectEndpoints({
             { from?: string; to?: string }
         >({
             query: (params) => ({
-                url: '/v1/mobile/parent/announcements/calendar/events',
+                url: '/mobile/parent/announcements/calendar/events',
                 params,
             }),
         }),

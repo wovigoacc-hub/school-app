@@ -13,7 +13,7 @@ export const parentResultsApi = api.injectEndpoints({
             string
         >({
             query: (studentId) => ({
-                url: `/v1/mobile/parent/students/${studentId}/results`,
+                url: `/mobile/parent/students/${studentId}/results`,
             }),
             providesTags: (result, error, studentId) => [
                 { type: 'ChildResults', id: studentId },
@@ -26,7 +26,7 @@ export const parentResultsApi = api.injectEndpoints({
             string
         >({
             query: (studentId) => ({
-                url: `/v1/mobile/parent/students/${studentId}/progress`,
+                url: `/mobile/parent/students/${studentId}/progress`,
             }),
             providesTags: (result, error, studentId) => [
                 { type: 'ProgressTrend', id: studentId },
