@@ -7,6 +7,7 @@ import {
     Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { ScreenWrapper } from '../../../components/layout/ScreenWrapper';
 import { SectionHeader } from '../../../components/layout/SectionHeader';
 import { Divider, Spacer } from '../../../components/layout/Divider';
@@ -40,6 +41,7 @@ const LANGUAGES: Array<{ value: Language; label: string; native: string }> = [
 interface SettingsRowProps {
     icon: string;
     label: string;
+    iconColor?: string;
     value?: string;
     onPress?: () => void;
     showChevron?: boolean;
@@ -47,11 +49,19 @@ interface SettingsRowProps {
 }
 
 function SettingsRow({
-    icon, label, value, onPress, showChevron = true, danger = false,
+    icon, label, value, onPress, iconColor,
+    showChevron = true, danger = false,
 }: SettingsRowProps) {
+    const defaultIconColor = danger ? Colors.error : (iconColor ?? Colors.textSecondary);
+
     return (
         <CardRow onPress={onPress} bordered>
-            <AppText style={styles.rowIcon}>{icon}</AppText>
+            <Icon
+                name={icon}
+                size={22}
+                color={defaultIconColor}
+                style={styles.rowIcon}
+            />
             <AppText
                 variant="body1"
                 style={[styles.rowLabel, danger && { color: Colors.error }]}
@@ -64,7 +74,7 @@ function SettingsRow({
                 </AppText>
             )}
             {showChevron && onPress && (
-                <AppText secondary style={styles.chevron}>›</AppText>
+                <Icon name="chevron-forward" size={18} color={Colors.textTertiary} />
             )}
         </CardRow>
     );
@@ -89,6 +99,7 @@ export function TeacherProfileScreen() {
     const { uploadImage, isUploading } = useImagePicker();
     const [isLoggingOut, setIsLoggingOut] = useState(false);
 
+    const navigation = useNavigation<any>();
     const { refreshing, onRefresh } = useRefresh(refetchClasses);
 
     // ─── Photo upload ──────────────────────────────────────────────────────────
@@ -177,9 +188,11 @@ export function TeacherProfileScreen() {
                         />
                         {/* Camera overlay */}
                         <View style={styles.cameraOverlay}>
-                            <AppText style={styles.cameraEmoji}>
-                                {isUploading ? '⏳' : '📷'}
-                            </AppText>
+                            {isUploading ? (
+                                <Icon name="sync-outline" size={14} color={Colors.teacher} />
+                            ) : (
+                                <Icon name="camera" size={14} color={Colors.teacher} />
+                            )}
                         </View>
                     </TouchableOpacity>
 
@@ -193,9 +206,12 @@ export function TeacherProfileScreen() {
                     {/* Class count pill */}
                     {classes.length > 0 && (
                         <View style={styles.classPill}>
-                            <AppText style={styles.classPillText}>
-                                👨‍🏫 {classes.length} class{classes.length > 1 ? 'es' : ''}
-                            </AppText>
+                            <View style={styles.classPillContent}>
+                                <Icon name="school" size={16} color={Colors.teacher} />
+                                <AppText style={styles.classPillText}>
+                                    {classes.length} class{classes.length > 1 ? 'es' : ''}
+                                </AppText>
+                            </View>
                         </View>
                     )}
                 </View>
@@ -260,19 +276,22 @@ export function TeacherProfileScreen() {
                 <SectionHeader title="Account" compact />
                 <AppCard noPadding style={styles.card}>
                     <SettingsRow
-                        icon="🔔"
+                        icon="notifications"
                         label="Notifications"
+                        iconColor={Colors.teacher}
                         value="All enabled"
-                        onPress={() => {/* TODO: NotificationPrefsScreen */ }}
+                        onPress={() => navigation.navigate('NotificationInbox')}
                     />
                     <SettingsRow
-                        icon="🔐"
+                        icon="lock-closed"
                         label="Change Password"
-                        onPress={() => {/* TODO: navigate to ChangePasswordScreen in settings mode */ }}
+                        iconColor={Colors.warning}
+                        onPress={() => navigation.navigate('ChangePassword')}
                     />
                     <SettingsRow
-                        icon="📱"
+                        icon="phone-portrait"
                         label="App Version"
+                        iconColor={Colors.textTertiary}
                         value={BUILD_FLAGS.IS_DEV ? 'Dev build' : '1.0.0'}
                         onPress={undefined}
                         showChevron={false}
@@ -283,13 +302,15 @@ export function TeacherProfileScreen() {
                 <SectionHeader title="Support" compact />
                 <AppCard noPadding style={styles.card}>
                     <SettingsRow
-                        icon="❓"
+                        icon="help-circle"
                         label="Help & FAQ"
+                        iconColor={Colors.success}
                         onPress={() => {/* TODO */ }}
                     />
                     <SettingsRow
-                        icon="✉️"
-                        label="Contact Support"
+                        icon="mail"
+                        label="Support"
+                        iconColor={Colors.parent}
                         value="support@schoolbridge.in"
                         onPress={() => {/* TODO: Linking.openURL mailto */ }}
                     />
@@ -300,6 +321,7 @@ export function TeacherProfileScreen() {
                 <AppButton
                     label={isLoggingOut ? 'Signing out…' : 'Sign Out'}
                     variant="secondary"
+                    leftIcon={<Icon name="log-out-outline" size={20} color={Colors.error} />}
                     loading={isLoggingOut}
                     onPress={handleLogout}
                     fullWidth
@@ -351,7 +373,12 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.teacherLight,
         borderRadius: BorderRadius.full,
         paddingHorizontal: Spacing[3],
-        paddingVertical: Spacing[1],
+        paddingVertical: Spacing[1.5],
+    },
+    classPillContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: Spacing[1.5],
     },
     classPillText: {
         fontSize: FontSize.sm,
@@ -395,10 +422,9 @@ const styles = StyleSheet.create({
     },
     langHint: { marginTop: Spacing[1] },
     // ── Settings rows ─────────────────────────────────────────────────────────
-    rowIcon: { fontSize: FontSize.lg, marginRight: Spacing[3] },
+    rowIcon: { marginRight: Spacing[3] },
     rowLabel: { flex: 1 },
     rowValue: { marginRight: Spacing[1] },
-    chevron: { fontSize: FontSize.xl },
     // ── Sign out ──────────────────────────────────────────────────────────────
     signOutBtn: {
         borderColor: Colors.errorBorder,

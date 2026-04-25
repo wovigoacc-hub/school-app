@@ -11,21 +11,22 @@ import { DotBadge } from '../common/AppBadge';
 import { Colors } from '../../constants/colors';
 import { BorderRadius, Spacing, AvatarSize } from '../../constants/spacing';
 import { formatTimeAgo } from '../../utils/date.utils';
+import Icon from 'react-native-vector-icons/Ionicons';
 import type { NotificationRecord, NotificationData } from '../../types/notification.types';
 import { NOTIFICATION_SCREEN_MAP } from '../../types/notification.types';
 
 // ─── Icon map per notification category ──────────────────────────────────────
 
-const NOTIFICATION_ICONS: Record<string, { emoji: string; bg: string }> = {
-    absence_alert: { emoji: '🔴', bg: '#fee2e2' },
-    homework_reminder: { emoji: '📚', bg: '#dbeafe' },
-    results_published: { emoji: '📊', bg: '#dcfce7' },
-    attendance_threshold: { emoji: '⚠️', bg: '#fef3c7' },
-    request_update: { emoji: '📩', bg: '#f3e8ff' },
-    announcement: { emoji: '📣', bg: '#e0f2fe' },
-    mark_deadline: { emoji: '✏️', bg: '#fef3c7' },
-    payment_failed: { emoji: '💳', bg: '#fee2e2' },
-    default: { emoji: '🔔', bg: Colors.primarySubtle },
+const NOTIFICATION_ICONS: Record<string, { icon: string; bg: string }> = {
+    absence_alert: { icon: 'alert-circle', bg: '#fee2e2' },
+    homework_reminder: { icon: 'book', bg: '#dbeafe' },
+    results_published: { icon: 'stats-chart', bg: '#dcfce7' },
+    attendance_threshold: { icon: 'warning', bg: '#fef3c7' },
+    request_update: { icon: 'mail-unread', bg: '#f3e8ff' },
+    announcement: { icon: 'megaphone', bg: '#e0f2fe' },
+    mark_deadline: { icon: 'create', bg: '#fef3c7' },
+    payment_failed: { icon: 'card', bg: '#fee2e2' },
+    default: { icon: 'notifications', bg: Colors.primarySubtle },
 };
 
 function getIconConfig(notification: NotificationRecord) {
@@ -80,7 +81,11 @@ export function NotificationItem({
         >
             {/* Icon bubble */}
             <View style={[styles.iconBubble, { backgroundColor: iconConfig.bg }]}>
-                <AppText style={styles.iconEmoji}>{iconConfig.emoji}</AppText>
+                <Icon
+                    name={iconConfig.icon}
+                    size={22}
+                    color={Colors.grey700}
+                />
             </View>
 
             {/* Content */}
@@ -132,7 +137,7 @@ export function FailedNotificationItem({
     return (
         <View style={[styles.container, styles.failedContainer, style]}>
             <View style={[styles.iconBubble, { backgroundColor: Colors.errorLight }]}>
-                <AppText style={styles.iconEmoji}>⚡</AppText>
+                <Icon name="flash" size={22} color={Colors.error} />
             </View>
             <View style={styles.content}>
                 <AppText variant="subtitle2" numberOfLines={1} style={styles.title}>

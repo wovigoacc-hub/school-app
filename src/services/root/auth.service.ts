@@ -49,9 +49,10 @@ export const authApi = api.injectEndpoints({
         }),
 
         // ─── Refresh token ──────────────────────────────────────────────────────
-        refreshToken: builder.mutation<RefreshTokenResponse, RefreshTokenRequest>({
-            query: (body) => ({
-                url: '/auth/refresh',
+        // Route: /auth/mobile/{teacher|parent}/refresh
+        refreshToken: builder.mutation<RefreshTokenResponse, RefreshTokenRequest & { userType: UserType }>({
+            query: ({ userType, ...body }) => ({
+                url: `/auth/mobile/${rolePath(userType)}/refresh`,
                 method: 'POST',
                 body,
             }),

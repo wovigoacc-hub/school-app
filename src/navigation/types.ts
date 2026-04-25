@@ -78,6 +78,7 @@ export type TeacherNavigatorParamList = {
 
     // ── Profile ───────────────────────────────────────────────────────────────
     TeacherProfile: undefined;
+    ChangePassword: undefined;
 };
 
 // ─── Parent bottom tabs ───────────────────────────────────────────────────────

@@ -116,10 +116,15 @@ const baseQueryWithReauth: BaseQueryFn<
 async function refreshAccessToken(api: any): Promise<boolean> {
     try {
         const stored = await getTokens();
-        if (!stored?.refreshToken) return false;
+        if (!stored?.refreshToken || !stored?.userType) return false;
+
+        // Server has separate refresh endpoints per role:
+        // POST /auth/mobile/teacher/refresh
+        // POST /auth/mobile/parent/refresh
+        const refreshUrl = `/auth/mobile/${stored.userType}/refresh`;
 
         const response = await axiosInstance.post<RefreshTokenResponse>(
-            '/auth/refresh',
+            refreshUrl,
             { refreshToken: stored.refreshToken },
         );
 

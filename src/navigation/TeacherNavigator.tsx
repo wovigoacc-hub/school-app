@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AppText } from '../components/common/AppText';
 import { CountBadge } from '../components/common/AppBadge';
 import { AppStatusBar } from '../components/common/AppStatusBar';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 // ── Screens ──────────────────────────────────────────────────────────────────
 import { TeacherHomeScreen } from '../screens/teacher/home/TeacherHomeScreen';
@@ -23,7 +24,8 @@ import { AnnouncementCreateScreen } from '../screens/teacher/announcements/Annou
 import { RequestListScreen } from '../screens/teacher/requests/RequestListScreen';
 import { RequestDetailScreen } from '../screens/teacher/requests/RequestDetailScreen';
 import { TeacherProfileScreen } from '../screens/teacher/profile/TeacherProfileScreen';
-
+import { ChangePasswordScreen } from '../screens/auth/ChangePasswordScreen';
+import { NotificationInboxScreen } from '../screens/teacher/notifications/NotificationInboxScreen';
 // ── Queries (for tab badges) ─────────────────────────────────────────────────
 import { useGetTeacherUnreadAnnouncementCountQuery }
     from '../services/teacher/announcements.service';
@@ -46,12 +48,12 @@ const Stack = createNativeStackNavigator<TeacherNavigatorParamList>();
 // ─── Tab icon helper ──────────────────────────────────────────────────────────
 
 function TabIcon({
-    emoji,
+    icon,
     label,
     focused,
     badge,
 }: {
-    emoji: string;
+    icon: string;
     label: string;
     focused: boolean;
     badge?: number;
@@ -59,15 +61,20 @@ function TabIcon({
     return (
         <View style={tabStyles.wrapper}>
             <View style={tabStyles.iconBox}>
-                <AppText style={tabStyles.emoji}>{emoji}</AppText>
+                <Icon
+                    name={focused ? icon : `${icon}-outline`}
+                    size={22}
+                    color={focused ? Colors.teacher : Colors.grey600}
+                />
                 {badge ? (
                     <CountBadge count={badge} size="sm" style={tabStyles.badge} />
                 ) : null}
             </View>
             <AppText
+                variant="caption"
                 style={[
                     tabStyles.label,
-                    { color: focused ? Colors.teacher : Colors.tabBarInactive },
+                    { color: focused ? Colors.teacher : Colors.grey600 },
                 ]}
                 numberOfLines={1}
             >
@@ -80,15 +87,16 @@ function TabIcon({
 const tabStyles = StyleSheet.create({
     wrapper: { alignItems: 'center', justifyContent: 'center', gap: 2 },
     iconBox: { position: 'relative' },
-    emoji: { fontSize: 22 },
     badge: {
         position: 'absolute',
         top: -4,
         right: -8,
     },
     label: {
-        fontSize: FontSize.xs,
-        fontWeight: FontWeight.medium,
+        fontSize: 10,
+        fontWeight: FontWeight.semiBold,
+        lineHeight: 12,
+        marginTop: 2,
     },
 });
 
@@ -113,7 +121,7 @@ function TeacherTabs() {
                 component={TeacherHomeScreen}
                 options={{
                     tabBarIcon: ({ focused }) => (
-                        <TabIcon emoji="🏠" label="Home" focused={focused} />
+                        <TabIcon icon="home" label="Home" focused={focused} />
                     ),
                 }}
             />
@@ -122,7 +130,7 @@ function TeacherTabs() {
                 component={AttendanceClassPickerScreen}
                 options={{
                     tabBarIcon: ({ focused }) => (
-                        <TabIcon emoji="📋" label="Attendance" focused={focused} />
+                        <TabIcon icon="clipboard" label="Attendance" focused={focused} />
                     ),
                 }}
             />
@@ -131,7 +139,7 @@ function TeacherTabs() {
                 component={HomeworkListScreen}
                 options={{
                     tabBarIcon: ({ focused }) => (
-                        <TabIcon emoji="📚" label="Homework" focused={focused} />
+                        <TabIcon icon="book" label="Homework" focused={focused} />
                     ),
                 }}
             />
@@ -140,7 +148,7 @@ function TeacherTabs() {
                 component={ExamListScreen}
                 options={{
                     tabBarIcon: ({ focused }) => (
-                        <TabIcon emoji="✏️" label="Marks" focused={focused} />
+                        <TabIcon icon="create" label="Marks" focused={focused} />
                     ),
                 }}
             />
@@ -150,7 +158,7 @@ function TeacherTabs() {
                 options={{
                     tabBarIcon: ({ focused }) => (
                         <TabIcon
-                            emoji="👤"
+                            icon="person"
                             label="Profile"
                             focused={focused}
                             badge={announcementBadge}
@@ -286,7 +294,7 @@ export function TeacherNavigator() {
             {/* Notifications */}
             <Stack.Screen
                 name="NotificationInbox"
-                component={TeacherHomeScreen}        // placeholder — add NotificationInboxScreen
+                component={NotificationInboxScreen}
                 options={{ title: 'Notifications' }}
             />
 
@@ -295,6 +303,11 @@ export function TeacherNavigator() {
                 name="TeacherProfile"
                 component={TeacherProfileScreen}
                 options={{ title: 'Profile' }}
+            />
+            <Stack.Screen
+                name="ChangePassword"
+                component={ChangePasswordScreen}
+                options={{ title: 'Change Password' }}
             />
         </Stack.Navigator>
     );
