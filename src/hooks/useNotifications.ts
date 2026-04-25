@@ -4,7 +4,7 @@ import messaging, {
 } from '@react-native-firebase/messaging';
 import { Platform, AppState, type AppStateStatus } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../app/store';
-import { selectIsAuthenticated, selectUserId } from '../store/slices/authSlice';
+import { selectIsAuthenticated, selectUserId, selectUserType } from '../store/slices/authSlice';
 import { showToast } from '../store/slices/uiSlice';
 import {
     setCachedPushToken,
@@ -27,6 +27,7 @@ export function useNotifications(navigationRef?: React.RefObject<NavigationRef>)
     const dispatch = useAppDispatch();
     const isAuthenticated = useAppSelector(selectIsAuthenticated);
     const userId = useAppSelector(selectUserId);
+    const userType = useAppSelector(selectUserType);
     const [registerToken] = useRegisterDeviceTokenMutation();
     const tokenRegisteredRef = useRef(false);
 
@@ -56,9 +57,11 @@ export function useNotifications(navigationRef?: React.RefObject<NavigationRef>)
 
             // Only register if token is new or changed
             if (token !== cached) {
+                if (!userType) return; // no userType yet — skip registration
                 await registerToken({
                     token,
                     platform: Platform.OS as 'ios' | 'android',
+                    userType,
                 }).unwrap();
                 setCachedPushToken(token);
             }
@@ -67,7 +70,7 @@ export function useNotifications(navigationRef?: React.RefObject<NavigationRef>)
         } catch {
             // Non-fatal — push notifications degrade gracefully
         }
-    }, [isAuthenticated, registerToken, requestPermission]);
+    }, [isAuthenticated, userType, registerToken, requestPermission]);
 
     // ─── Handle navigation from notification data ────────────────────────────
 

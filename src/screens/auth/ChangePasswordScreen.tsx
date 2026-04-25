@@ -165,6 +165,7 @@ export function ChangePasswordScreen() {
             setApiError('');
             try {
                 await changePassword({
+                    userType: userType!,
                     currentPassword: values.currentPassword,
                     newPassword: values.newPassword,
                 }).unwrap();

@@ -59,24 +59,27 @@ function AppNavigator() {
         <Stack.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>
             {!isAuthenticated ? (
                 // ── Unauthenticated ────────────────────────────────────────────────
-                <Stack.Screen name="Auth" component={AuthNavigator} />
+                <Stack.Screen key="auth" name="Auth" component={AuthNavigator} />
             ) : isFirstLogin ? (
                 // ── First login — must change password ────────────────────────────
-                // Use the Auth navigator but land on ChangePassword screen
+                // key="auth-firstlogin" forces remount so initialParams take effect.
+                // LoginScreen also explicitly calls navigation.navigate('ChangePassword')
+                // as a belt-and-suspenders approach.
                 <Stack.Screen
+                    key="auth-firstlogin"
                     name="Auth"
                     component={AuthNavigator}
                     initialParams={{ screen: 'ChangePassword' } as any}
                 />
             ) : isTeacher ? (
                 // ── Teacher app ───────────────────────────────────────────────────
-                <Stack.Screen name="Teacher" component={TeacherNavigator} />
+                <Stack.Screen key="teacher" name="Teacher" component={TeacherNavigator} />
             ) : isParent ? (
                 // ── Parent app ────────────────────────────────────────────────────
-                <Stack.Screen name="Parent" component={ParentNavigator} />
+                <Stack.Screen key="parent" name="Parent" component={ParentNavigator} />
             ) : (
                 // ── Fallback (shouldn't happen) ───────────────────────────────────
-                <Stack.Screen name="Auth" component={AuthNavigator} />
+                <Stack.Screen key="auth-fallback" name="Auth" component={AuthNavigator} />
             )}
         </Stack.Navigator>
     );

@@ -16,11 +16,16 @@ export const API_BASE_URL =
         ? DEV_BASE_URL
         : 'https://api.schoolbridge.in/v1';   // swap to your production URL
 
+// ─── School identifier ────────────────────────────────────────────────────────
+// This app is built for a specific school — set to the school's slug in the database.
+// In production, inject this via build config / environment flavors.
+export const SCHOOL_SLUG = 'school'; // ← change to match your school's slug
+
 // ─── Auth endpoints ───────────────────────────────────────────────────────────
 
 export const AUTH_ENDPOINTS = {
-    TEACHER_LOGIN: '/auth/teacher/login',
-    PARENT_LOGIN: '/auth/parent/login',
+    TEACHER_LOGIN: '/auth/mobile/teacher/login',
+    PARENT_LOGIN: '/auth/mobile/parent/login',
     REFRESH_TOKEN: '/auth/refresh',
     LOGOUT: '/auth/logout',
     CHANGE_PASSWORD: '/auth/change-password',

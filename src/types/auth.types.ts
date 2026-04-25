@@ -11,14 +11,19 @@ export type SchoolUserRole =
 export interface LoginRequest {
     email: string;
     password: string;
+    schoolSlug: string;
 }
 
 export interface LoginResponse {
     accessToken: string;
     refreshToken: string;
-    userType: UserType;
-    isFirstLogin: boolean;
-    user: AuthUser;
+    user: {
+        id: string;
+        userType: UserType;
+        schoolId: string;
+        email: string;
+        isFirstLogin: boolean;
+    };
 }
 
 // ─── Authenticated user (decoded from JWT + server) ──────────────────────────
@@ -38,10 +43,9 @@ export interface AuthUser {
 // ─── JWT payload (decoded client-side) ───────────────────────────────────────
 
 export interface JwtPayload {
-    sub: string;       // userId
+    sub: string;         // userId
+    userType: UserType;  // was incorrectly 'type' — server uses 'userType'
     schoolId: string;
-    email: string;
-    type: UserType;
     iat: number;
     exp: number;
 }

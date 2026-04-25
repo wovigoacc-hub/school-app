@@ -5,36 +5,45 @@ import type {
     ChangePasswordRequest,
     RefreshTokenRequest,
     RefreshTokenResponse,
+    UserType,
 } from '../../types/auth.types';
 import type { RegisterDeviceTokenRequest } from '../../types/user.types';
 import type { ApiResponse } from '../../types/api.types';
+
+// Maps UserType to the server's mobile sub-path
+const rolePath = (userType: UserType) =>
+    userType === 'teacher' ? 'teacher' : 'parent';
 
 export const authApi = api.injectEndpoints({
     endpoints: (builder) => ({
 
         // ─── Login (teacher) ────────────────────────────────────────────────────
-        teacherLogin: builder.mutation<ApiResponse<LoginResponse>, LoginRequest>({
+        // Server returns LoginResponse directly (no ApiResponse wrapper)
+        teacherLogin: builder.mutation<LoginResponse, LoginRequest>({
             query: (body) => ({
-                url: '/auth/teacher/login',
+                url: '/auth/mobile/teacher/login',
                 method: 'POST',
                 body,
             }),
         }),
 
         // ─── Login (parent) ─────────────────────────────────────────────────────
-        parentLogin: builder.mutation<ApiResponse<LoginResponse>, LoginRequest>({
+        // Server returns LoginResponse directly (no ApiResponse wrapper)
+        parentLogin: builder.mutation<LoginResponse, LoginRequest>({
             query: (body) => ({
-                url: '/auth/parent/login',
+                url: '/auth/mobile/parent/login',
                 method: 'POST',
                 body,
             }),
         }),
 
-        // ─── Change password (first login + voluntary) ───────────────────────────
-        changePassword: builder.mutation<ApiResponse<null>, ChangePasswordRequest>({
-            query: (body) => ({
-                url: '/auth/change-password',
-                method: 'POST',
+        // ─── Force change password (first login) ─────────────────────────────────
+        // Route: /auth/mobile/{teacher|parent}/force-change-password
+        // userType is stripped from the body before sending — used only to pick URL
+        changePassword: builder.mutation<ApiResponse<null>, ChangePasswordRequest & { userType: UserType }>({
+            query: ({ userType, ...body }) => ({
+                url: `/auth/mobile/${rolePath(userType)}/force-change-password`,
+                method: 'PATCH',
                 body,
             }),
         }),
@@ -58,18 +67,20 @@ export const authApi = api.injectEndpoints({
         }),
 
         // ─── Register FCM device token ───────────────────────────────────────────
-        registerDeviceToken: builder.mutation<ApiResponse<null>, RegisterDeviceTokenRequest>({
-            query: (body) => ({
-                url: '/auth/device-token',
+        // Route: /auth/mobile/{teacher|parent}/device-token
+        registerDeviceToken: builder.mutation<ApiResponse<null>, RegisterDeviceTokenRequest & { userType: UserType }>({
+            query: ({ userType, ...body }) => ({
+                url: `/auth/mobile/${rolePath(userType)}/device-token`,
                 method: 'POST',
                 body,
             }),
         }),
 
         // ─── Remove device token (on logout) ────────────────────────────────────
-        removeDeviceToken: builder.mutation<ApiResponse<null>, { token: string }>({
-            query: (body) => ({
-                url: '/auth/device-token',
+        // Route: /auth/mobile/{teacher|parent}/device-token
+        removeDeviceToken: builder.mutation<ApiResponse<null>, { token: string; userType: UserType }>({
+            query: ({ userType, ...body }) => ({
+                url: `/auth/mobile/${rolePath(userType)}/device-token`,
                 method: 'DELETE',
                 body,
             }),

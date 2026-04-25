@@ -99,15 +99,10 @@ export function getSchoolIdFromToken(token: string): string | null {
  * Extract the user type ("teacher" | "parent") from a JWT
  */
 export function getUserTypeFromToken(token: string): UserType | null {
-    return decodeJwt(token)?.type ?? null;
+    return decodeJwt(token)?.userType ?? null;
 }
 
-/**
- * Extract email from a JWT
- */
-export function getEmailFromToken(token: string): string | null {
-    return decodeJwt(token)?.email ?? null;
-}
+
 
 /**
  * Extract all useful fields in one call — used on app startup
@@ -115,7 +110,6 @@ export function getEmailFromToken(token: string): string | null {
 export function extractTokenClaims(token: string): {
     userId: string;
     schoolId: string;
-    email: string;
     userType: UserType;
     exp: number;
 } | null {
@@ -125,8 +119,7 @@ export function extractTokenClaims(token: string): {
     return {
         userId: payload.sub,
         schoolId: payload.schoolId,
-        email: payload.email,
-        userType: payload.type,
+        userType: payload.userType,
         exp: payload.exp,
     };
 }
@@ -142,7 +135,7 @@ export function isValidToken(token: string | null | undefined): boolean {
 
     const payload = decodeJwt(token);
     if (!payload) return false;
-    if (!payload.sub || !payload.schoolId || !payload.type) return false;
+    if (!payload.sub || !payload.schoolId || !payload.userType) return false;
     if (isTokenExpired(token)) return false;
 
     return true;

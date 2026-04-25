@@ -7,7 +7,7 @@ import {
     clearAllAuthStorage,
     setPreferredLang,
 } from '../../utils/storage.utils';
-import { extractTokenClaims, isValidToken } from '../../utils/jwt.utils';
+import { extractTokenClaims } from '../../utils/jwt.utils';
 
 // ─── State shape ──────────────────────────────────────────────────────────────
 
@@ -62,27 +62,32 @@ export const bootstrapAuth = createAsyncThunk(
         try {
             const stored = await getTokens();
 
-            if (!stored || !isValidToken(stored.accessToken)) {
-                // No valid tokens — user needs to log in
+            // No tokens stored — fresh install or after logout
+            if (!stored || !stored.refreshToken) return null;
+
+            // Decode access token for user claims.
+            // We use decodeJwt (not isValidToken) so that an *expired* access token
+            // doesn't block restore — the base query proactively refreshes it on the
+            // first API call via the isTokenExpiringSoon check.
+            const claims = extractTokenClaims(stored.accessToken);
+            if (!claims?.userId || !claims?.schoolId) {
+                // Token is structurally corrupt — need fresh login
                 return null;
             }
 
-            const claims = extractTokenClaims(stored.accessToken);
-            if (!claims) return null;
-
             return {
-                accessToken: stored.accessToken,
+                accessToken: stored.accessToken,   // may be expired — OK
                 refreshToken: stored.refreshToken,
-                userType: stored.userType,
+                userType: stored.userType,          // from Keychain (reliable)
                 userId: claims.userId,
                 schoolId: claims.schoolId,
-                email: claims.email,
             };
         } catch (err: any) {
             return rejectWithValue(err.message ?? 'Bootstrap failed');
         }
     },
 );
+
 
 // ─── Slice ────────────────────────────────────────────────────────────────────
 
@@ -98,7 +103,7 @@ const authSlice = createSlice({
                 accessToken: string;
                 refreshToken: string;
                 userType: UserType;
-                user: AuthUser;
+                user: Partial<AuthUser> & { id: string; schoolId: string; email: string; isFirstLogin: boolean };
             }>,
         ) => {
             const { accessToken, refreshToken, userType, user } = action.payload;
@@ -108,14 +113,14 @@ const authSlice = createSlice({
             state.userId = user.id;
             state.schoolId = user.schoolId;
             state.email = user.email;
-            state.firstName = user.firstName;
-            state.lastName = user.lastName;
-            state.photoUrl = user.photoUrl ?? null;
-            state.preferredLang = user.preferredLang;
+            state.firstName = user.firstName ?? null;       // filled by profile fetch later
+            state.lastName = user.lastName ?? null;         // filled by profile fetch later
+            state.photoUrl = user.photoUrl ?? null;         // filled by profile fetch later
+            state.preferredLang = user.preferredLang ?? 'ENGLISH';
             state.isFirstLogin = user.isFirstLogin;
             state.isAuthenticated = true;
             state.bootstrapError = null;
-            setPreferredLang(user.preferredLang);
+            if (user.preferredLang) setPreferredLang(user.preferredLang);
         },
 
         // Called by baseQueryWithReauth after token refresh
@@ -195,7 +200,7 @@ const authSlice = createSlice({
                     return;
                 }
 
-                const { accessToken, refreshToken, userType, userId, schoolId, email } =
+                const { accessToken, refreshToken, userType, userId, schoolId } =
                     action.payload;
 
                 state.accessToken = accessToken;
@@ -203,9 +208,8 @@ const authSlice = createSlice({
                 state.userType = userType;
                 state.userId = userId;
                 state.schoolId = schoolId;
-                state.email = email;
                 state.isAuthenticated = true;
-                // firstName/lastName/photoUrl filled in by profile query after navigator mounts
+                // email / firstName / lastName / photoUrl filled in by profile query after navigator mounts
             })
             .addCase(bootstrapAuth.rejected, (state, action) => {
                 state.isBootstrapping = false;

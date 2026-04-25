@@ -9,6 +9,8 @@ import {
     Platform,
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppText } from '../../components/common/AppText';
 import { AppInput } from '../../components/common/AppInput';
@@ -31,7 +33,11 @@ import {
 import { Colors } from '../../constants/colors';
 import { Spacing, Layout, BorderRadius } from '../../constants/spacing';
 import { FontSize, FontWeight } from '../../constants/typography';
+import { SCHOOL_SLUG } from '../../constants/api.constants';
 import type { UserType } from '../../types/auth.types';
+import type { AuthStackParamList } from '../../navigation/types';
+
+type AuthNav = NativeStackNavigationProp<AuthStackParamList>;
 
 // ─── Form shape ───────────────────────────────────────────────────────────────
 
@@ -96,6 +102,7 @@ function RoleToggle({ selected, onChange }: RoleToggleProps) {
 
 export function LoginScreen() {
     const dispatch = useAppDispatch();
+    const navigation = useNavigation<AuthNav>();
     const [role, setRole] = useState<UserType>('parent');
     const [apiError, setApiError] = useState('');
 
@@ -120,22 +127,29 @@ export function LoginScreen() {
                 const result = await mutation({
                     email: values.email.trim().toLowerCase(),
                     password: values.password,
+                    schoolSlug: SCHOOL_SLUG,
                 }).unwrap();
 
-                const { accessToken, refreshToken, user } = result.data;
+                const { accessToken, refreshToken, user } = result;
 
                 // 1. Persist tokens to Keychain
                 await storeTokens({ accessToken, refreshToken, userType: role });
 
-                // 2. Hydrate Redux — triggers RootNavigator to switch stacks
+                // 2. Hydrate Redux
                 dispatch(setAuth({ accessToken, refreshToken, userType: role, user }));
 
-                // Navigation is handled by RootNavigator watching isAuthenticated + isFirstLogin
+                // 3. Navigate — root navigator re-renders but may not transition
+                //    if the screen name doesn't change (e.g. Auth→Auth on isFirstLogin).
+                //    Explicitly push within the Auth stack to ensure the user moves forward.
+                if (user.isFirstLogin) {
+                    navigation.navigate('ChangePassword' as any);
+                }
+                // When isFirstLogin=false, root navigator unmounts Auth and mounts Teacher/Parent
             } catch (err: any) {
                 setApiError(parseLoginError(err));
             }
         },
-        [role, teacherLogin, parentLogin, dispatch],
+        [role, teacherLogin, parentLogin, dispatch, navigation],
     );
 
     return (

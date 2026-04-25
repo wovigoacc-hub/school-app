@@ -119,7 +119,7 @@ async function refreshAccessToken(api: any): Promise<boolean> {
         if (!stored?.refreshToken) return false;
 
         const response = await axiosInstance.post<RefreshTokenResponse>(
-            '/v1/auth/refresh',
+            '/auth/refresh',
             { refreshToken: stored.refreshToken },
         );
 
