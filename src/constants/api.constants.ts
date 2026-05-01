@@ -6,9 +6,9 @@ import { Platform } from 'react-native';
 // Production: read from env / build config
 
 const DEV_BASE_URL = Platform.select({
-    android: 'http://10.71.94.93:8000',
-    ios: 'http://10.71.94.93:8000',
-    default: 'http://10.71.94.93:3000',
+    android: 'http://10.27.202.93:8000',
+    ios: 'http://10.27.202.93:8000',
+    default: 'http://10.27.202.93:3000',
 });
 
 export const API_BASE_URL =

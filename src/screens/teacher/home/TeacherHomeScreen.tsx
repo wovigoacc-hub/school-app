@@ -27,13 +27,15 @@ import { FontSize, FontWeight } from '../../../constants/typography';
 import { formatDeadlineLabel } from '../../../utils/date.utils';
 import type { TeacherClass, TeacherPendingTasks } from '../../../types/teacher.types';
 import type { TeacherNavigatorParamList } from '../../../navigation/types';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 type Nav = NativeStackNavigationProp<TeacherNavigatorParamList>;
 
 // ─── Pending task card ────────────────────────────────────────────────────────
 
 interface PendingTaskCardProps {
-    icon: string;
+    iconName: string;
+    iconColor: string;
     title: string;
     subtitle: string;
     count?: number;
@@ -42,7 +44,7 @@ interface PendingTaskCardProps {
 }
 
 function PendingTaskCard({
-    icon, title, subtitle, count, urgency = 'medium', onPress,
+    iconName, iconColor, title, subtitle, count, urgency = 'medium', onPress,
 }: PendingTaskCardProps) {
     const borderColor =
         urgency === 'high' ? Colors.error :
@@ -56,7 +58,9 @@ function PendingTaskCard({
             noPadding
         >
             <View style={styles.taskInner}>
-                <AppText style={styles.taskIcon}>{icon}</AppText>
+                <View style={[styles.taskIconContainer, { backgroundColor: iconColor + '15' }]}>
+                    <Ionicons name={iconName} size={22} color={iconColor} />
+                </View>
                 <View style={styles.taskText}>
                     <AppText variant="subtitle2" numberOfLines={1}>{title}</AppText>
                     <AppText variant="caption" secondary numberOfLines={1}>{subtitle}</AppText>
@@ -157,7 +161,7 @@ export function TeacherHomeScreen() {
             <View style={styles.greeting}>
                 <View style={styles.greetingText}>
                     <AppText variant="h3">
-                        Good {getGreeting()}! 👋
+                        Good {getGreeting()}! <Ionicons name={getGreetingIcon()} size={24} color={Colors.warning} />
                     </AppText>
                     <AppText variant="body1" secondary numberOfLines={1}>
                         {displayName}
@@ -182,7 +186,8 @@ export function TeacherHomeScreen() {
                     {openExams.map((exam) => (
                         <PendingTaskCard
                             key={exam.examId}
-                            icon="✏️"
+                            iconName="create-outline"
+                            iconColor={Colors.primary}
                             title={`${exam.name} — Mark Entry`}
                             subtitle={formatDeadlineLabel(exam.markEntryEnd)}
                             count={exam.myClasses.length}
@@ -197,7 +202,8 @@ export function TeacherHomeScreen() {
                     {overdueHW.map((hw) => (
                         <PendingTaskCard
                             key={hw.id}
-                            icon="📚"
+                            iconName="book-outline"
+                            iconColor={Colors.success}
                             title={hw.title}
                             subtitle={`${hw.subjectName} · ${hw.pendingCount} pending`}
                             count={hw.pendingCount}
@@ -216,22 +222,26 @@ export function TeacherHomeScreen() {
             <SectionHeader title="Quick Actions" />
             <View style={styles.quickActions}>
                 <QuickActionBtn
-                    icon="📋"
+                    iconName="calendar-outline"
+                    iconColor={Colors.warning}
                     label="Attendance"
                     onPress={() => navigation.navigate('AttendanceClassPicker')}
                 />
                 <QuickActionBtn
-                    icon="📚"
+                    iconName="book-outline"
+                    iconColor={Colors.success}
                     label="Homework"
                     onPress={() => navigation.navigate('HomeworkList')}
                 />
                 <QuickActionBtn
-                    icon="✏️"
+                    iconName="create-outline"
+                    iconColor={Colors.primary}
                     label="Marks"
                     onPress={() => navigation.navigate('ExamList')}
                 />
                 <QuickActionBtn
-                    icon="📣"
+                    iconName="megaphone-outline"
+                    iconColor={Colors.parent}
                     label="Announce"
                     onPress={() => navigation.navigate('AnnouncementFeed')}
                 />
@@ -301,9 +311,10 @@ export function TeacherHomeScreen() {
 // ─── Quick action button ──────────────────────────────────────────────────────
 
 function QuickActionBtn({
-    icon, label, onPress,
+    iconName, iconColor, label, onPress,
 }: {
-    icon: string;
+    iconName: string;
+    iconColor: string;
     label: string;
     onPress: () => void;
 }) {
@@ -315,8 +326,8 @@ function QuickActionBtn({
             accessibilityRole="button"
             accessibilityLabel={label}
         >
-            <View style={styles.quickBtnIcon}>
-                <AppText style={styles.quickBtnEmoji}>{icon}</AppText>
+            <View style={[styles.quickBtnIcon, { backgroundColor: iconColor + '15' }]}>
+                <Ionicons name={iconName} size={24} color={iconColor} />
             </View>
             <AppText variant="caption" center numberOfLines={1}>
                 {label}
@@ -330,6 +341,13 @@ function getGreeting(): string {
     if (h < 12) return 'morning';
     if (h < 17) return 'afternoon';
     return 'evening';
+}
+
+function getGreetingIcon(): string {
+    const h = new Date().getHours();
+    if (h < 12) return 'sunny';
+    if (h < 17) return 'partly-sunny';
+    return 'moon';
 }
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
@@ -357,7 +375,13 @@ const styles = StyleSheet.create({
         padding: Spacing[3],
         gap: Spacing[3],
     },
-    taskIcon: { fontSize: 22 },
+    taskIconContainer: {
+        width: 44,
+        height: 44,
+        borderRadius: BorderRadius.lg,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     taskText: { flex: 1 },
     taskCount: {
         borderRadius: BorderRadius.full,
@@ -382,11 +406,9 @@ const styles = StyleSheet.create({
         width: 52,
         height: 52,
         borderRadius: BorderRadius.xl,
-        backgroundColor: Colors.primarySubtle,
         justifyContent: 'center',
         alignItems: 'center',
     },
-    quickBtnEmoji: { fontSize: 22 },
     classGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',

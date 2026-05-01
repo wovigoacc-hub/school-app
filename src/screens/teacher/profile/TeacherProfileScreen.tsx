@@ -14,16 +14,15 @@ import { Divider, Spacer } from '../../../components/layout/Divider';
 import { AppText } from '../../../components/common/AppText';
 import { AppCard, CardRow } from '../../../components/common/AppCard';
 import { AppAvatar } from '../../../components/common/AppAvatar';
-import { AppButton } from '../../../components/common/AppButton';
 import { AppChip } from '../../../components/common/AppChip';
 import { AppRefreshControl, useRefresh } from '../../../components/common/AppRefreshControl';
 import { useAuth } from '../../../hooks/useAuth';
 import { useImagePicker } from '../../../hooks/useImagePicker';
 import { useAppDispatch } from '../../../app/store';
-import { showSuccessToast, showErrorToast, showModal } from '../../../store/slices/uiSlice';
+import { showSuccessToast } from '../../../store/slices/uiSlice';
 import { useGetMyClassesQuery } from '../../../services/teacher/classes.service';
 import { Colors } from '../../../constants/colors';
-import { BorderRadius, AvatarSize, Spacing, Layout } from '../../../constants/spacing';
+import { BorderRadius, Spacing, Layout } from '../../../constants/spacing';
 import { FontSize, FontWeight } from '../../../constants/typography';
 import type { Language } from '../../../types/auth.types';
 import { BUILD_FLAGS } from '../../../constants/config';
@@ -55,25 +54,28 @@ function SettingsRow({
     const defaultIconColor = danger ? Colors.error : (iconColor ?? Colors.textSecondary);
 
     return (
-        <CardRow onPress={onPress} bordered>
-            <Icon
-                name={icon}
-                size={22}
-                color={defaultIconColor}
-                style={styles.rowIcon}
-            />
-            <AppText
-                variant="body1"
-                style={[styles.rowLabel, danger && { color: Colors.error }]}
-            >
-                {label}
-            </AppText>
-            {value && (
-                <AppText variant="body2" secondary style={styles.rowValue}>
-                    {value}
+        <CardRow onPress={onPress} bordered={!danger}>
+            <View style={[styles.rowIconContainer, { backgroundColor: defaultIconColor + '15' }]}>
+                <Icon
+                    name={icon}
+                    size={20}
+                    color={defaultIconColor}
+                />
+            </View>
+            <View style={styles.rowContent}>
+                <AppText
+                    variant="body1"
+                    style={[styles.rowLabel, danger && { color: Colors.error, fontWeight: FontWeight.semiBold }]}
+                >
+                    {label}
                 </AppText>
-            )}
-            {showChevron && onPress && (
+                {value && (
+                    <AppText variant="caption" secondary>
+                        {value}
+                    </AppText>
+                )}
+            </View>
+            {showChevron && onPress && !danger && (
                 <Icon name="chevron-forward" size={18} color={Colors.textTertiary} />
             )}
         </CardRow>
@@ -88,7 +90,6 @@ export function TeacherProfileScreen() {
         user,
         displayName,
         preferredLang,
-        isTeacher,
         logout,
         updateLocalProfile,
     } = useAuth();
@@ -155,7 +156,6 @@ export function TeacherProfileScreen() {
                     onPress: async () => {
                         setIsLoggingOut(true);
                         await logout();
-                        // RootNavigator automatically redirects to Auth
                     },
                 },
             ],
@@ -173,47 +173,59 @@ export function TeacherProfileScreen() {
             >
                 {/* ── Profile header ─────────────────────────────────────────── */}
                 <View style={styles.profileHeader}>
-                    <TouchableOpacity
-                        activeOpacity={0.8}
-                        onPress={handlePhotoPress}
-                        style={styles.avatarWrapper}
-                        accessibilityRole="button"
-                        accessibilityLabel="Change profile photo"
-                    >
-                        <AppAvatar
-                            firstName={user?.firstName ?? ''}
-                            lastName={user?.lastName}
-                            photoUrl={user?.photoUrl}
-                            size="2xl"
-                        />
-                        {/* Camera overlay */}
-                        <View style={styles.cameraOverlay}>
-                            {isUploading ? (
-                                <Icon name="sync-outline" size={14} color={Colors.teacher} />
-                            ) : (
-                                <Icon name="camera" size={14} color={Colors.teacher} />
-                            )}
-                        </View>
-                    </TouchableOpacity>
+                    <View style={styles.headerBg} />
+                    <View style={styles.headerContent}>
+                        <TouchableOpacity
+                            activeOpacity={0.8}
+                            onPress={handlePhotoPress}
+                            style={styles.avatarWrapper}
+                            accessibilityRole="button"
+                            accessibilityLabel="Change profile photo"
+                        >
+                            <AppAvatar
+                                firstName={user?.firstName ?? ''}
+                                lastName={user?.lastName}
+                                photoUrl={user?.photoUrl}
+                                size="2xl"
+                            />
+                            <View style={styles.cameraOverlay}>
+                                {isUploading ? (
+                                    <Icon name="sync-outline" size={14} color={Colors.primary} />
+                                ) : (
+                                    <Icon name="camera" size={14} color={Colors.primary} />
+                                )}
+                            </View>
+                        </TouchableOpacity>
 
-                    <AppText variant="h3" center style={styles.name}>
-                        {displayName}
-                    </AppText>
-                    <AppText variant="body2" secondary center>
-                        {user?.email}
-                    </AppText>
+                        <AppText variant="h3" center style={styles.name}>
+                            {displayName}
+                        </AppText>
+                        <AppText variant="body2" secondary center>
+                            {user?.email}
+                        </AppText>
 
-                    {/* Class count pill */}
-                    {classes.length > 0 && (
-                        <View style={styles.classPill}>
-                            <View style={styles.classPillContent}>
-                                <Icon name="school" size={16} color={Colors.teacher} />
-                                <AppText style={styles.classPillText}>
-                                    {classes.length} class{classes.length > 1 ? 'es' : ''}
+                        {/* Stats Row */}
+                        <View style={styles.statsRow}>
+                            <View style={styles.statItem}>
+                                <AppText variant="h4" color={Colors.primary}>{classes.length}</AppText>
+                                <AppText variant="caption" secondary>Classes</AppText>
+                            </View>
+                            <View style={styles.statDivider} />
+                            <View style={styles.statItem}>
+                                <AppText variant="h4" color={Colors.success}>
+                                    {classes.reduce((acc, c) => acc + c.studentCount, 0)}
                                 </AppText>
+                                <AppText variant="caption" secondary>Students</AppText>
+                            </View>
+                            <View style={styles.statDivider} />
+                            <View style={styles.statItem}>
+                                <AppText variant="h4" color={Colors.warning}>
+                                    {classes.filter(c => c.isClassTeacher).length}
+                                </AppText>
+                                <AppText variant="caption" secondary>Class Teacher</AppText>
                             </View>
                         </View>
-                    )}
+                    </View>
                 </View>
 
                 {/* ── My classes ─────────────────────────────────────────────── */}
@@ -276,20 +288,20 @@ export function TeacherProfileScreen() {
                 <SectionHeader title="Account" compact />
                 <AppCard noPadding style={styles.card}>
                     <SettingsRow
-                        icon="notifications"
+                        icon="notifications-outline"
                         label="Notifications"
-                        iconColor={Colors.teacher}
+                        iconColor={Colors.primary}
                         value="All enabled"
                         onPress={() => navigation.navigate('NotificationInbox')}
                     />
                     <SettingsRow
-                        icon="lock-closed"
+                        icon="lock-closed-outline"
                         label="Change Password"
                         iconColor={Colors.warning}
                         onPress={() => navigation.navigate('ChangePassword')}
                     />
                     <SettingsRow
-                        icon="phone-portrait"
+                        icon="phone-portrait-outline"
                         label="App Version"
                         iconColor={Colors.textTertiary}
                         value={BUILD_FLAGS.IS_DEV ? 'Dev build' : '1.0.0'}
@@ -302,13 +314,13 @@ export function TeacherProfileScreen() {
                 <SectionHeader title="Support" compact />
                 <AppCard noPadding style={styles.card}>
                     <SettingsRow
-                        icon="help-circle"
+                        icon="help-circle-outline"
                         label="Help & FAQ"
                         iconColor={Colors.success}
                         onPress={() => {/* TODO */ }}
                     />
                     <SettingsRow
-                        icon="mail"
+                        icon="mail-outline"
                         label="Support"
                         iconColor={Colors.parent}
                         value="support@schoolbridge.in"
@@ -317,17 +329,20 @@ export function TeacherProfileScreen() {
                 </AppCard>
 
                 {/* ── Sign out ─────────────────────────────────────────────────── */}
-                <Spacer size={Spacing[4]} />
-                <AppButton
-                    label={isLoggingOut ? 'Signing out…' : 'Sign Out'}
-                    variant="secondary"
-                    leftIcon={<Icon name="log-out-outline" size={20} color={Colors.error} />}
-                    loading={isLoggingOut}
-                    onPress={handleLogout}
-                    fullWidth
-                    textStyle={{ color: Colors.error }}
-                    style={styles.signOutBtn}
-                />
+                <View style={styles.signOutWrapper}>
+                    <TouchableOpacity
+                        activeOpacity={0.7}
+                        onPress={handleLogout}
+                        style={styles.signOutRow}
+                    >
+                        <View style={[styles.rowIconContainer, { backgroundColor: Colors.error + '15' }]}>
+                            <Icon name="log-out-outline" size={20} color={Colors.error} />
+                        </View>
+                        <AppText variant="body1" style={styles.signOutText}>
+                            {isLoggingOut ? 'Signing out…' : 'Sign Out'}
+                        </AppText>
+                    </TouchableOpacity>
+                </View>
 
                 <Spacer size={Spacing[10]} />
             </ScrollView>
@@ -337,57 +352,88 @@ export function TeacherProfileScreen() {
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
-const AVATAR_SIZE = AvatarSize['2xl']; // 80
-
 const styles = StyleSheet.create({
     scroll: {
         paddingBottom: Spacing[10],
     },
     profileHeader: {
+        paddingTop: Spacing[4],
+        paddingBottom: Spacing[6],
+        paddingHorizontal: Layout.screenPaddingH,
+    },
+    headerBg: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: 140,
+        backgroundColor: Colors.primarySubtle,
+        borderBottomLeftRadius: 40,
+        borderBottomRightRadius: 40,
+    },
+    headerContent: {
         alignItems: 'center',
-        paddingTop: Spacing[6],
-        paddingBottom: Spacing[5],
-        gap: Spacing[2],
     },
     avatarWrapper: {
         position: 'relative',
-        marginBottom: Spacing[2],
+        marginBottom: Spacing[4],
+        padding: 4,
+        backgroundColor: Colors.surface,
+        borderRadius: BorderRadius.full,
+        elevation: 4,
+        shadowColor: Colors.black,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
     },
     cameraOverlay: {
         position: 'absolute',
-        bottom: 0,
-        right: 0,
-        width: 28,
-        height: 28,
-        borderRadius: 14,
+        bottom: 4,
+        right: 4,
+        width: 32,
+        height: 32,
+        borderRadius: 16,
         backgroundColor: Colors.surface,
-        borderWidth: 2,
-        borderColor: Colors.border,
+        borderWidth: 3,
+        borderColor: Colors.surface,
         justifyContent: 'center',
         alignItems: 'center',
+        elevation: 2,
     },
-    cameraEmoji: { fontSize: 14 },
-    name: { marginTop: Spacing[1] },
-    classPill: {
-        marginTop: Spacing[1],
-        backgroundColor: Colors.teacherLight,
-        borderRadius: BorderRadius.full,
-        paddingHorizontal: Spacing[3],
-        paddingVertical: Spacing[1.5],
+    name: {
+        fontWeight: FontWeight.bold,
+        color: Colors.textPrimary,
     },
-    classPillContent: {
+    statsRow: {
         flexDirection: 'row',
+        backgroundColor: Colors.surface,
+        borderRadius: BorderRadius.xl,
+        paddingVertical: Spacing[4],
+        paddingHorizontal: Spacing[2],
+        marginTop: Spacing[6],
+        width: '100%',
+        elevation: 2,
+        shadowColor: Colors.black,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
         alignItems: 'center',
-        gap: Spacing[1.5],
     },
-    classPillText: {
-        fontSize: FontSize.sm,
-        color: Colors.teacher,
-        fontWeight: FontWeight.medium,
+    statItem: {
+        flex: 1,
+        alignItems: 'center',
+        gap: 2,
+    },
+    statDivider: {
+        width: 1,
+        height: 24,
+        backgroundColor: Colors.border,
     },
     card: {
         marginBottom: Spacing[4],
+        marginHorizontal: Layout.screenPaddingH,
         overflow: 'hidden',
+        borderRadius: BorderRadius.xl,
     },
     // ── Class rows ──────────────────────────────────────────────────────────
     classRow: {
@@ -399,8 +445,8 @@ const styles = StyleSheet.create({
     classBadge: {
         width: 44,
         height: 44,
-        borderRadius: BorderRadius.xl,
-        backgroundColor: Colors.teacherLight,
+        borderRadius: BorderRadius.lg,
+        backgroundColor: Colors.primarySubtle,
         justifyContent: 'center',
         alignItems: 'center',
         flexShrink: 0,
@@ -408,7 +454,7 @@ const styles = StyleSheet.create({
     classBadgeText: {
         fontSize: FontSize.sm,
         fontWeight: FontWeight.bold,
-        color: Colors.teacher,
+        color: Colors.primary,
     },
     classInfo: { flex: 1, gap: 2 },
     // ── Language ─────────────────────────────────────────────────────────────
@@ -422,11 +468,40 @@ const styles = StyleSheet.create({
     },
     langHint: { marginTop: Spacing[1] },
     // ── Settings rows ─────────────────────────────────────────────────────────
-    rowIcon: { marginRight: Spacing[3] },
-    rowLabel: { flex: 1 },
-    rowValue: { marginRight: Spacing[1] },
+    rowIconContainer: {
+        width: 36,
+        height: 36,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: Spacing[3],
+    },
+    rowContent: {
+        flex: 1,
+    },
+    rowLabel: {
+        color: Colors.textPrimary,
+        fontWeight: FontWeight.medium,
+    },
     // ── Sign out ──────────────────────────────────────────────────────────────
-    signOutBtn: {
-        borderColor: Colors.errorBorder,
+    signOutWrapper: {
+        marginHorizontal: Layout.screenPaddingH,
+        marginTop: Spacing[2],
+    },
+    signOutRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: Colors.surface,
+        borderRadius: BorderRadius.xl,
+        padding: Spacing[4],
+        elevation: 1,
+        shadowColor: Colors.black,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+    },
+    signOutText: {
+        color: Colors.error,
+        fontWeight: FontWeight.semiBold,
     },
 });

@@ -54,8 +54,8 @@ export function useAuth() {
         try {
             // Remove device token so this device stops receiving push notifications
             const pushToken = getCachedPushToken();
-            if (pushToken) {
-                await removeDeviceToken({ token: pushToken }).unwrap().catch(() => { });
+            if (pushToken && userType) {
+                await removeDeviceToken({ token: pushToken, userType }).unwrap().catch(() => { });
             }
 
             // Invalidate refresh token on server

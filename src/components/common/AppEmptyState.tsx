@@ -7,13 +7,16 @@ import {
 import { AppText } from './AppText';
 import { AppButton } from './AppButton';
 import { Colors } from '../../constants/colors';
-import { Spacing } from '../../constants/spacing';
+import { BorderRadius, Spacing } from '../../constants/spacing';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface AppEmptyStateProps {
-    /** Large emoji or icon — use emoji for zero-dependency icons */
+    /** Icon name (Ionicons) or custom React Node */
     icon?: string | React.ReactNode;
+    /** Color for the icon (if icon is a string) */
+    iconColor?: string;
     title: string;
     message?: string;
     /** Primary action button */
@@ -31,42 +34,50 @@ interface AppEmptyStateProps {
 
 export const EMPTY_STATES = {
     attendance: {
-        icon: '📋',
+        icon: 'calendar-outline',
+        iconColor: Colors.warning,
         title: 'No attendance records',
         message: 'Attendance data will appear here once sessions are marked.',
     },
     homework: {
-        icon: '📚',
+        icon: 'book-outline',
+        iconColor: Colors.success,
         title: 'No homework',
         message: 'Homework assigned to your classes will appear here.',
     },
     results: {
-        icon: '📊',
+        icon: 'stats-chart-outline',
+        iconColor: Colors.primary,
         title: 'No results yet',
         message: 'Exam results will appear here once they are published.',
     },
     announcements: {
-        icon: '📣',
+        icon: 'megaphone-outline',
+        iconColor: Colors.parent,
         title: 'No announcements',
         message: 'School announcements will appear here.',
     },
     requests: {
-        icon: '📩',
+        icon: 'mail-unread-outline',
+        iconColor: Colors.info,
         title: 'No requests',
         message: 'Parent requests assigned to you will appear here.',
     },
     notifications: {
-        icon: '🔔',
+        icon: 'notifications-outline',
+        iconColor: Colors.primary,
         title: 'No notifications',
         message: "You're all caught up!",
     },
     search: {
-        icon: '🔍',
+        icon: 'search-outline',
+        iconColor: Colors.textSecondary,
         title: 'No results found',
         message: 'Try adjusting your search or filters.',
     },
     offline: {
-        icon: '📡',
+        icon: 'cloud-offline-outline',
+        iconColor: Colors.error,
         title: 'No connection',
         message: 'Check your internet connection and try again.',
     },
@@ -76,15 +87,17 @@ export type EmptyStatePreset = keyof typeof EMPTY_STATES;
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-interface AppEmptyStateWithPresetProps extends Omit<AppEmptyStateProps, 'title' | 'icon' | 'message'> {
+interface AppEmptyStateWithPresetProps extends Omit<AppEmptyStateProps, 'title' | 'icon' | 'message' | 'iconColor'> {
     preset: EmptyStatePreset;
     title?: string;
     icon?: string | React.ReactNode;
+    iconColor?: string;
     message?: string;
 }
 
 export function AppEmptyState({
     icon,
+    iconColor,
     title,
     message,
     actionLabel,
@@ -94,6 +107,8 @@ export function AppEmptyState({
     style,
     compact = false,
 }: AppEmptyStateProps) {
+    const finalIconColor = iconColor ?? Colors.textTertiary;
+
     return (
         <View
             style={[styles.container, compact && styles.containerCompact, style]}
@@ -103,9 +118,17 @@ export function AppEmptyState({
             {icon && (
                 <View style={[styles.iconWrapper, compact && styles.iconWrapperCompact]}>
                     {typeof icon === 'string' ? (
-                        <AppText style={[styles.emoji, compact && styles.emojiCompact]}>
-                            {icon}
-                        </AppText>
+                        <View style={[
+                            styles.iconContainer,
+                            compact && styles.iconContainerCompact,
+                            { backgroundColor: finalIconColor + '15' },
+                        ]}>
+                            <Ionicons
+                                name={icon}
+                                size={compact ? 32 : 44}
+                                color={finalIconColor}
+                            />
+                        </View>
                     ) : (
                         icon
                     )}
@@ -161,6 +184,7 @@ export function PresetEmptyState({
     preset,
     title,
     icon,
+    iconColor,
     message,
     ...rest
 }: AppEmptyStateWithPresetProps) {
@@ -168,6 +192,7 @@ export function PresetEmptyState({
     return (
         <AppEmptyState
             icon={icon ?? config.icon}
+            iconColor={iconColor ?? config.iconColor}
             title={title ?? config.title}
             message={message ?? config.message}
             {...rest}
@@ -195,12 +220,16 @@ const styles = StyleSheet.create({
     iconWrapperCompact: {
         marginBottom: Spacing[3],
     },
-    emoji: {
-        fontSize: 56,
-        textAlign: 'center',
+    iconContainer: {
+        width: 80,
+        height: 80,
+        borderRadius: BorderRadius.full,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-    emojiCompact: {
-        fontSize: 36,
+    iconContainerCompact: {
+        width: 60,
+        height: 60,
     },
     title: {
         marginBottom: Spacing[2],
