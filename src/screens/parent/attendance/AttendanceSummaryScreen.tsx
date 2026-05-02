@@ -36,6 +36,7 @@ import { Layout, Spacing } from '../../../constants/spacing';
 import { FontSize } from '../../../constants/typography';
 import type { DailyAttendanceRecord } from '../../../types/attendance.types';
 import type { ParentNavigatorParamList } from '../../../navigation/types';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 type RouteProps = NativeStackScreenProps<
     ParentNavigatorParamList,
@@ -52,28 +53,36 @@ interface RecordRowProps {
 function RecordRow({ record }: RecordRowProps) {
     return (
         <View style={styles.recordRow}>
-            {/* Date */}
+            {/* Date block */}
             <View style={styles.recordDate}>
-                <AppText variant="body2">
-                    {formatDate(record.date)}
+                <AppText style={styles.dateDay}>
+                    {new Date(record.date).getDate()}
                 </AppText>
-                <AppText variant="caption" secondary>
-                    {new Date(record.date).toLocaleDateString('en-IN', { weekday: 'short' })}
-                </AppText>
+                <View>
+                    <AppText style={styles.dateMonth}>
+                        {new Date(record.date).toLocaleDateString('en-IN', { month: 'short' }).toUpperCase()}
+                    </AppText>
+                    <AppText variant="caption" secondary>
+                        {new Date(record.date).toLocaleDateString('en-IN', { weekday: 'short' })}
+                    </AppText>
+                </View>
             </View>
 
-            {/* Status badge */}
-            <AttendanceStatusBadge
-                status={record.status}
-                compact
-            />
+            {/* Content block */}
+            <View style={styles.recordContent}>
+                <AttendanceStatusBadge
+                    status={record.status}
+                    compact
+                />
+                {record.note && (
+                    <AppText variant="caption" secondary style={styles.recordNote} numberOfLines={2}>
+                        {record.note}
+                    </AppText>
+                )}
+            </View>
 
-            {/* Note */}
-            {record.note && (
-                <AppText variant="caption" secondary style={styles.recordNote} numberOfLines={1}>
-                    {record.note}
-                </AppText>
-            )}
+            {/* Icon */}
+            <Icon name="chevron-forward" size={16} color={Colors.textTertiary} />
         </View>
     );
 }
@@ -89,7 +98,7 @@ export function AttendanceSummaryScreen() {
         data,
         isLoading,
         refetch,
-    } = useGetChildAttendanceHistoryQuery({ studentId });
+    } = useGetChildAttendanceHistoryQuery({ studentId }, { skip: !studentId });
 
     const history = data?.data;
     const records = history?.records ?? [];
@@ -119,16 +128,23 @@ export function AttendanceSummaryScreen() {
                 keyExtractor={(item) => item.date}
                 renderItem={renderItem}
                 ListHeaderComponent={
-                    <View>
+                    <View style={styles.header}>
                         {/* ── Student info ─────────────────────────────────────── */}
                         {history && (
                             <View style={styles.studentHeader}>
-                                <AppText variant="h4">
-                                    {history.studentName}
-                                </AppText>
-                                <AppText variant="body2" secondary>
-                                    {history.className} {history.section}
-                                </AppText>
+                                <View style={styles.headerTitleRow}>
+                                    <View style={styles.iconCircle}>
+                                        <Icon name="person" size={20} color={Colors.parent} />
+                                    </View>
+                                    <View>
+                                        <AppText variant="h4" style={styles.studentName}>
+                                            {history.studentName}
+                                        </AppText>
+                                        <AppText variant="body2" secondary>
+                                            {history.className} {history.section}
+                                        </AppText>
+                                    </View>
+                                </View>
                             </View>
                         )}
 
@@ -147,8 +163,9 @@ export function AttendanceSummaryScreen() {
 
                         {/* ── Calendar link ─────────────────────────────────────── */}
                         <AppButton
-                            label="View Calendar"
+                            label="View Detailed Calendar"
                             variant="secondary"
+                            leftIcon={<Icon name="calendar-outline" size={18} color={Colors.primary} />}
                             onPress={() =>
                                 navigation.navigate('AttendanceCalendar', { studentId })
                             }
@@ -158,17 +175,10 @@ export function AttendanceSummaryScreen() {
 
                         {/* ── Records header ────────────────────────────────────── */}
                         <SectionHeader
-                            title="All Records"
+                            title="Attendance Logs"
                             count={records.length}
                             style={styles.recordsHeader}
                         />
-
-                        {/* Column labels */}
-                        <View style={styles.colHeader}>
-                            <AppText style={styles.colDate}>Date</AppText>
-                            <AppText style={styles.colStatus}>Status</AppText>
-                            <AppText style={styles.colNote}>Note</AppText>
-                        </View>
                     </View>
                 }
                 ListEmptyComponent={
@@ -202,56 +212,85 @@ const styles = StyleSheet.create({
     listContent: {
         paddingBottom: Spacing[10],
     },
+    header: {
+        backgroundColor: Colors.background,
+        paddingBottom: Spacing[2],
+    },
     studentHeader: {
         paddingHorizontal: Layout.screenPaddingH,
-        paddingTop: Spacing[4],
-        paddingBottom: Spacing[3],
-        gap: Spacing[1],
+        paddingTop: Spacing[6],
+        paddingBottom: Spacing[4],
+    },
+    headerTitleRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: Spacing[3],
+    },
+    iconCircle: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        backgroundColor: Colors.parentLight,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    studentName: {
+        color: Colors.textPrimary,
+        lineHeight: 28,
     },
     ringCard: {
         marginHorizontal: Layout.screenPaddingH,
-        marginBottom: Spacing[3],
+        marginBottom: Spacing[5],
     },
     ringPlaceholder: {
         height: 160,
         marginHorizontal: Layout.screenPaddingH,
         backgroundColor: Colors.surfaceSecondary,
-        borderRadius: 12,
-        marginBottom: Spacing[3],
+        borderRadius: 16,
+        marginBottom: Spacing[5],
     },
     calBtn: {
         marginHorizontal: Layout.screenPaddingH,
-        marginBottom: Spacing[2],
+        marginBottom: Spacing[4],
     },
     recordsHeader: {
         paddingHorizontal: Layout.screenPaddingH,
         paddingTop: Spacing[2],
+        backgroundColor: Colors.surface,
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
     },
-    colHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: Layout.screenPaddingH,
-        paddingVertical: Spacing[2],
-        backgroundColor: Colors.surfaceSecondary,
-        borderBottomWidth: StyleSheet.hairlineWidth,
-        borderBottomColor: Colors.border,
-    },
-    colDate: { fontSize: FontSize.xs, color: Colors.textTertiary, width: 100 },
-    colStatus: { fontSize: FontSize.xs, color: Colors.textTertiary, flex: 1 },
-    colNote: { fontSize: FontSize.xs, color: Colors.textTertiary, flex: 1 },
     recordRow: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: Layout.screenPaddingH,
-        paddingVertical: Spacing[3],
+        paddingVertical: Spacing[4],
         backgroundColor: Colors.surface,
-        gap: Spacing[3],
+        gap: Spacing[4],
     },
     recordDate: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: Spacing[3],
         width: 100,
-        gap: 2,
+    },
+    dateDay: {
+        fontSize: 24,
+        fontWeight: '700',
+        color: Colors.textPrimary,
+        minWidth: 32,
+    },
+    dateMonth: {
+        fontSize: 10,
+        fontWeight: '700',
+        color: Colors.textTertiary,
+    },
+    recordContent: {
+        flex: 1,
+        alignItems: 'flex-start',
+        gap: 4,
     },
     recordNote: {
-        flex: 1,
+        marginTop: 2,
     },
 });

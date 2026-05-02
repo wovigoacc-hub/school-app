@@ -5,14 +5,13 @@ import {
     TouchableOpacity,
     StyleSheet,
     Alert,
+    Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { ScreenWrapper } from '../../../components/layout/ScreenWrapper';
-import { SectionHeader } from '../../../components/layout/SectionHeader';
-import { Divider, Spacer } from '../../../components/layout/Divider';
+import { Spacer } from '../../../components/layout/Divider';
 import { AppText } from '../../../components/common/AppText';
-import { AppCard, CardRow } from '../../../components/common/AppCard';
 import { AppAvatar } from '../../../components/common/AppAvatar';
 import { AppChip } from '../../../components/common/AppChip';
 import { AppRefreshControl, useRefresh } from '../../../components/common/AppRefreshControl';
@@ -35,50 +34,93 @@ const LANGUAGES: Array<{ value: Language; label: string; native: string }> = [
     { value: 'MALAYALAM', label: 'Malayalam', native: 'മലയാളം' },
 ];
 
-// ─── Row item helper ──────────────────────────────────────────────────────────
+// ─── Reusable row component ───────────────────────────────────────────────────
 
-interface SettingsRowProps {
+interface ProfileRowProps {
     icon: string;
+    iconColor: string;
+    iconBg: string;
     label: string;
-    iconColor?: string;
     value?: string;
     onPress?: () => void;
-    showChevron?: boolean;
+    rightElement?: React.ReactNode;
     danger?: boolean;
+    isLast?: boolean;
 }
 
-function SettingsRow({
-    icon, label, value, onPress, iconColor,
-    showChevron = true, danger = false,
-}: SettingsRowProps) {
-    const defaultIconColor = danger ? Colors.error : (iconColor ?? Colors.textSecondary);
-
-    return (
-        <CardRow onPress={onPress} bordered={!danger}>
-            <View style={[styles.rowIconContainer, { backgroundColor: defaultIconColor + '15' }]}>
-                <Icon
-                    name={icon}
-                    size={20}
-                    color={defaultIconColor}
-                />
+function ProfileRow({
+    icon, iconColor, iconBg, label, value,
+    onPress, rightElement, danger = false, isLast = false,
+}: ProfileRowProps) {
+    const inner = (
+        <View style={[styles.rowInner, !isLast && styles.rowBorder]}>
+            <View style={[styles.iconBubble, { backgroundColor: iconBg }]}>
+                <Icon name={icon} size={18} color={iconColor} />
             </View>
             <View style={styles.rowContent}>
                 <AppText
                     variant="body1"
-                    style={[styles.rowLabel, danger && { color: Colors.error, fontWeight: FontWeight.semiBold }]}
+                    style={[styles.rowLabel, danger && { color: Colors.error }]}
+                    numberOfLines={1}
                 >
                     {label}
                 </AppText>
-                {value && (
-                    <AppText variant="caption" secondary>
+                {value !== undefined && (
+                    <AppText variant="caption" secondary numberOfLines={1} style={styles.rowValue}>
                         {value}
                     </AppText>
                 )}
             </View>
-            {showChevron && onPress && !danger && (
-                <Icon name="chevron-forward" size={18} color={Colors.textTertiary} />
+            {rightElement ?? (
+                onPress && (
+                    <Icon
+                        name="chevron-forward"
+                        size={16}
+                        color={Colors.textTertiary}
+                        style={styles.chevron}
+                    />
+                )
             )}
-        </CardRow>
+        </View>
+    );
+
+    if (onPress) {
+        return (
+            <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={onPress}
+                accessibilityRole="button"
+                accessibilityLabel={label}
+            >
+                {inner}
+            </TouchableOpacity>
+        );
+    }
+    return inner;
+}
+
+// ─── Section card wrapper ─────────────────────────────────────────────────────
+
+interface SectionCardProps {
+    title: string;
+    icon: string;
+    iconColor: string;
+    children: React.ReactNode;
+}
+
+function SectionCard({ title, icon, iconColor, children }: SectionCardProps) {
+    return (
+        <View style={styles.sectionCard}>
+            <View style={styles.sectionHeader}>
+                <Icon name={icon} size={14} color={iconColor} style={{ marginRight: 6 }} />
+                <AppText style={[styles.sectionTitle, { color: iconColor }]}>
+                    {title.toUpperCase()}
+                </AppText>
+            </View>
+            <View style={styles.sectionBody}>
+                {children}
+            </View>
+        </View>
     );
 }
 
@@ -162,8 +204,11 @@ export function TeacherProfileScreen() {
         );
     }, [logout]);
 
+    const totalStudents = classes.reduce((acc, c) => acc + c.studentCount, 0);
+    const classTeacherCount = classes.filter(c => c.isClassTeacher).length;
+
     return (
-        <ScreenWrapper statusBar="teacher" noKeyboard>
+        <ScreenWrapper statusBar="teacher" noKeyboard noPadding>
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.scroll}
@@ -171,180 +216,229 @@ export function TeacherProfileScreen() {
                     <AppRefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                 }
             >
-                {/* ── Profile header ─────────────────────────────────────────── */}
-                <View style={styles.profileHeader}>
-                    <View style={styles.headerBg} />
-                    <View style={styles.headerContent}>
-                        <TouchableOpacity
-                            activeOpacity={0.8}
-                            onPress={handlePhotoPress}
-                            style={styles.avatarWrapper}
-                            accessibilityRole="button"
-                            accessibilityLabel="Change profile photo"
-                        >
+                {/* ── Hero header ───────────────────────────────────────────── */}
+                <View style={styles.hero}>
+                    <View style={styles.heroBg} />
+
+                    {/* Avatar with camera badge */}
+                    <TouchableOpacity
+                        activeOpacity={0.85}
+                        onPress={handlePhotoPress}
+                        style={styles.avatarWrapper}
+                        accessibilityRole="button"
+                        accessibilityLabel="Change profile photo"
+                    >
+                        <View style={styles.avatarRing}>
                             <AppAvatar
                                 firstName={user?.firstName ?? ''}
                                 lastName={user?.lastName}
                                 photoUrl={user?.photoUrl}
                                 size="2xl"
                             />
-                            <View style={styles.cameraOverlay}>
-                                {isUploading ? (
-                                    <Icon name="sync-outline" size={14} color={Colors.primary} />
-                                ) : (
-                                    <Icon name="camera" size={14} color={Colors.primary} />
-                                )}
-                            </View>
-                        </TouchableOpacity>
-
-                        <AppText variant="h3" center style={styles.name}>
-                            {displayName}
-                        </AppText>
-                        <AppText variant="body2" secondary center>
-                            {user?.email}
-                        </AppText>
-
-                        {/* Stats Row */}
-                        <View style={styles.statsRow}>
-                            <View style={styles.statItem}>
-                                <AppText variant="h4" color={Colors.primary}>{classes.length}</AppText>
-                                <AppText variant="caption" secondary>Classes</AppText>
-                            </View>
-                            <View style={styles.statDivider} />
-                            <View style={styles.statItem}>
-                                <AppText variant="h4" color={Colors.success}>
-                                    {classes.reduce((acc, c) => acc + c.studentCount, 0)}
-                                </AppText>
-                                <AppText variant="caption" secondary>Students</AppText>
-                            </View>
-                            <View style={styles.statDivider} />
-                            <View style={styles.statItem}>
-                                <AppText variant="h4" color={Colors.warning}>
-                                    {classes.filter(c => c.isClassTeacher).length}
-                                </AppText>
-                                <AppText variant="caption" secondary>Class Teacher</AppText>
-                            </View>
                         </View>
+                        <View style={styles.cameraBadge}>
+                            <Icon
+                                name={isUploading ? 'refresh' : 'camera'}
+                                size={13}
+                                color={Colors.white}
+                            />
+                        </View>
+                    </TouchableOpacity>
+
+                    {/* Name + email */}
+                    <AppText variant="h3" center style={styles.heroName}>
+                        {displayName}
+                    </AppText>
+                    <AppText variant="body2" center style={styles.heroEmail}>
+                        {user?.email}
+                    </AppText>
+
+                    {/* Role pill */}
+                    <View style={styles.pillRow}>
+                        <View style={styles.pill}>
+                            <Icon name="school" size={12} color={Colors.primary} />
+                            <AppText style={styles.pillText}>Teacher</AppText>
+                        </View>
+                        {classTeacherCount > 0 && (
+                            <View style={[styles.pill, styles.pillGold]}>
+                                <Icon name="star" size={12} color="#f59e0b" />
+                                <AppText style={[styles.pillText, { color: '#f59e0b' }]}>
+                                    Class Teacher
+                                </AppText>
+                            </View>
+                        )}
                     </View>
                 </View>
 
-                {/* ── My classes ─────────────────────────────────────────────── */}
-                {classes.length > 0 && (
-                    <>
-                        <SectionHeader title="My Classes" compact />
-                        <AppCard noPadding style={styles.card}>
+                {/* ── Stats bar ─────────────────────────────────────────────── */}
+                <View style={styles.statsCard}>
+                    <View style={styles.statItem}>
+                        <View style={[styles.statIconBubble, { backgroundColor: '#eff6ff' }]}>
+                            <Icon name="layers" size={18} color={Colors.primary} />
+                        </View>
+                        <AppText style={[styles.statNumber, { color: Colors.primary }]}>
+                            {classes.length}
+                        </AppText>
+                        <AppText variant="caption" secondary>Classes</AppText>
+                    </View>
+
+                    <View style={styles.statDivider} />
+
+                    <View style={styles.statItem}>
+                        <View style={[styles.statIconBubble, { backgroundColor: '#f0fdf4' }]}>
+                            <Icon name="people" size={18} color={Colors.success} />
+                        </View>
+                        <AppText style={[styles.statNumber, { color: Colors.success }]}>
+                            {totalStudents}
+                        </AppText>
+                        <AppText variant="caption" secondary>Students</AppText>
+                    </View>
+
+                    <View style={styles.statDivider} />
+
+                    <View style={styles.statItem}>
+                        <View style={[styles.statIconBubble, { backgroundColor: '#fffbeb' }]}>
+                            <Icon name="ribbon" size={18} color="#f59e0b" />
+                        </View>
+                        <AppText style={[styles.statNumber, { color: '#f59e0b' }]}>
+                            {classTeacherCount}
+                        </AppText>
+                        <AppText variant="caption" secondary>Class Role</AppText>
+                    </View>
+                </View>
+
+                <View style={styles.body}>
+
+                    {/* ── My Classes ───────────────────────────────────────────── */}
+                    {classes.length > 0 && (
+                        <SectionCard title="My Classes" icon="school-outline" iconColor="#3b82f6">
                             {classes.map((cls, i) => (
-                                <View key={cls.classId}>
-                                    <View style={styles.classRow}>
-                                        <View style={styles.classBadge}>
-                                            <AppText style={styles.classBadgeText}>
-                                                {cls.name.charAt(0)}{cls.section}
-                                            </AppText>
-                                        </View>
-                                        <View style={styles.classInfo}>
+                                <View
+                                    key={cls.classId}
+                                    style={[styles.classRow, i < classes.length - 1 && styles.rowBorder]}
+                                >
+                                    <View style={styles.classBadge}>
+                                        <AppText style={styles.classBadgeText}>
+                                            {cls.name.charAt(0)}{cls.section}
+                                        </AppText>
+                                    </View>
+                                    <View style={styles.classInfo}>
+                                        <View style={styles.classNameRow}>
                                             <AppText variant="subtitle2">
-                                                {cls.name} {cls.section}
+                                                {cls.name} – {cls.section}
                                             </AppText>
-                                            <AppText variant="caption" secondary>
-                                                {cls.studentCount} students
-                                                {cls.isClassTeacher ? ' · Class Teacher' : ''}
-                                            </AppText>
-                                            {cls.mySubjects.length > 0 && (
-                                                <AppText variant="caption" tertiary numberOfLines={1}>
-                                                    {cls.mySubjects.map((s) => s.subjectName).join(', ')}
-                                                </AppText>
+                                            {cls.isClassTeacher && (
+                                                <View style={styles.ctBadge}>
+                                                    <Icon name="star" size={10} color="#f59e0b" />
+                                                    <AppText style={styles.ctBadgeText}>CT</AppText>
+                                                </View>
                                             )}
                                         </View>
+                                        <AppText variant="caption" secondary>
+                                            {cls.studentCount} students
+                                        </AppText>
+                                        {cls.mySubjects.length > 0 && (
+                                            <AppText variant="caption" style={styles.subjectText} numberOfLines={1}>
+                                                {cls.mySubjects.map((s) => s.subjectName).join(' · ')}
+                                            </AppText>
+                                        )}
                                     </View>
-                                    {i < classes.length - 1 && <Divider indent={Spacing[4]} />}
+                                    <Icon name="chevron-forward" size={16} color={Colors.textTertiary} />
                                 </View>
                             ))}
-                        </AppCard>
-                    </>
-                )}
+                        </SectionCard>
+                    )}
 
-                {/* ── Language preference ─────────────────────────────────────── */}
-                <SectionHeader title="Language" compact />
-                <AppCard noPadding style={styles.card}>
-                    <View style={styles.langInner}>
-                        <View style={styles.langChips}>
-                            {LANGUAGES.map((lang) => (
-                                <AppChip
-                                    key={lang.value}
-                                    label={lang.native}
-                                    selected={preferredLang === lang.value}
-                                    onPress={() => handleLanguageChange(lang.value)}
-                                    size="md"
-                                />
-                            ))}
+                    {/* ── Language ─────────────────────────────────────────────── */}
+                    <SectionCard title="Language" icon="language" iconColor="#06b6d4">
+                        <View style={styles.langInner}>
+                            <AppText variant="body2" secondary style={{ marginBottom: Spacing[3] }}>
+                                Select your preferred language for the app
+                            </AppText>
+                            <View style={styles.langChips}>
+                                {LANGUAGES.map((lang) => (
+                                    <AppChip
+                                        key={lang.value}
+                                        label={lang.native}
+                                        selected={preferredLang === lang.value}
+                                        onPress={() => handleLanguageChange(lang.value)}
+                                        size="md"
+                                    />
+                                ))}
+                            </View>
                         </View>
-                        <AppText variant="caption" secondary style={styles.langHint}>
-                            Changes how dates and text appear throughout the app
-                        </AppText>
-                    </View>
-                </AppCard>
+                    </SectionCard>
 
-                {/* ── Account ─────────────────────────────────────────────────── */}
-                <SectionHeader title="Account" compact />
-                <AppCard noPadding style={styles.card}>
-                    <SettingsRow
-                        icon="notifications-outline"
-                        label="Notifications"
-                        iconColor={Colors.primary}
-                        value="All enabled"
-                        onPress={() => navigation.navigate('NotificationInbox')}
-                    />
-                    <SettingsRow
-                        icon="lock-closed-outline"
-                        label="Change Password"
-                        iconColor={Colors.warning}
-                        onPress={() => navigation.navigate('ChangePassword')}
-                    />
-                    <SettingsRow
-                        icon="phone-portrait-outline"
-                        label="App Version"
-                        iconColor={Colors.textTertiary}
-                        value={BUILD_FLAGS.IS_DEV ? 'Dev build' : '1.0.0'}
-                        onPress={undefined}
-                        showChevron={false}
-                    />
-                </AppCard>
+                    {/* ── Account ──────────────────────────────────────────────── */}
+                    <SectionCard title="Account" icon="person-circle" iconColor="#3b82f6">
+                        <ProfileRow
+                            icon="notifications"
+                            iconColor="#f59e0b"
+                            iconBg="#fffbeb"
+                            label="Notifications"
+                            value="All enabled"
+                            onPress={() => navigation.navigate('NotificationInbox')}
+                        />
+                        <ProfileRow
+                            icon="lock-closed"
+                            iconColor="#3b82f6"
+                            iconBg="#eff6ff"
+                            label="Change Password"
+                            value="Update your account password"
+                            onPress={() => navigation.navigate('ChangePassword')}
+                        />
+                        <ProfileRow
+                            icon="phone-portrait"
+                            iconColor="#6b7280"
+                            iconBg="#f3f4f6"
+                            label="App Version"
+                            value={BUILD_FLAGS.IS_DEV ? 'Dev build' : '1.0.0'}
+                            isLast
+                        />
+                    </SectionCard>
 
-                {/* ── Support ─────────────────────────────────────────────────── */}
-                <SectionHeader title="Support" compact />
-                <AppCard noPadding style={styles.card}>
-                    <SettingsRow
-                        icon="help-circle-outline"
-                        label="Help & FAQ"
-                        iconColor={Colors.success}
-                        onPress={() => {/* TODO */ }}
-                    />
-                    <SettingsRow
-                        icon="mail-outline"
-                        label="Support"
-                        iconColor={Colors.parent}
-                        value="support@schoolbridge.in"
-                        onPress={() => {/* TODO: Linking.openURL mailto */ }}
-                    />
-                </AppCard>
+                    {/* ── Support ───────────────────────────────────────────────── */}
+                    <SectionCard title="Support" icon="help-buoy" iconColor="#22c55e">
+                        <ProfileRow
+                            icon="help-circle"
+                            iconColor="#22c55e"
+                            iconBg="#f0fdf4"
+                            label="Help & FAQ"
+                            value="Guides and common questions"
+                            onPress={() => {/* TODO */ }}
+                        />
+                        <ProfileRow
+                            icon="mail"
+                            iconColor="#06b6d4"
+                            iconBg="#ecfeff"
+                            label="Contact Support"
+                            value="support@schoolbridge.in"
+                            isLast
+                            onPress={() => {/* TODO: Linking.openURL mailto */ }}
+                        />
+                    </SectionCard>
 
-                {/* ── Sign out ─────────────────────────────────────────────────── */}
-                <View style={styles.signOutWrapper}>
+                    {/* ── Sign Out ──────────────────────────────────────────────── */}
                     <TouchableOpacity
-                        activeOpacity={0.7}
+                        activeOpacity={0.8}
                         onPress={handleLogout}
-                        style={styles.signOutRow}
+                        style={styles.signOutBtn}
+                        accessibilityRole="button"
+                        accessibilityLabel="Sign out"
+                        disabled={isLoggingOut}
                     >
-                        <View style={[styles.rowIconContainer, { backgroundColor: Colors.error + '15' }]}>
-                            <Icon name="log-out-outline" size={20} color={Colors.error} />
+                        <View style={styles.signOutInner}>
+                            <View style={styles.signOutIcon}>
+                                <Icon name="log-out" size={18} color="#ef4444" />
+                            </View>
+                            <AppText style={styles.signOutLabel}>
+                                {isLoggingOut ? 'Signing out…' : 'Sign Out'}
+                            </AppText>
                         </View>
-                        <AppText variant="body1" style={styles.signOutText}>
-                            {isLoggingOut ? 'Signing out…' : 'Sign Out'}
-                        </AppText>
                     </TouchableOpacity>
-                </View>
 
-                <Spacer size={Spacing[10]} />
+                    <Spacer size={Spacing[10]} />
+                </View>
             </ScrollView>
         </ScreenWrapper>
     );
@@ -354,98 +448,218 @@ export function TeacherProfileScreen() {
 
 const styles = StyleSheet.create({
     scroll: {
-        paddingBottom: Spacing[10],
+        flexGrow: 1,
     },
-    profileHeader: {
-        paddingTop: Spacing[4],
-        paddingBottom: Spacing[6],
-        paddingHorizontal: Layout.screenPaddingH,
+
+    // ── Hero ─────────────────────────────────────────────────────────────────
+    hero: {
+        alignItems: 'center',
+        paddingBottom: Spacing[4],
+        paddingTop: Spacing[2],
     },
-    headerBg: {
+    heroBg: {
         position: 'absolute',
         top: 0,
         left: 0,
         right: 0,
-        height: 140,
+        height: 130,
         backgroundColor: Colors.primarySubtle,
-        borderBottomLeftRadius: 40,
-        borderBottomRightRadius: 40,
-    },
-    headerContent: {
-        alignItems: 'center',
+        borderBottomLeftRadius: 32,
+        borderBottomRightRadius: 32,
     },
     avatarWrapper: {
+        marginTop: Spacing[6],
+        marginBottom: Spacing[3],
         position: 'relative',
-        marginBottom: Spacing[4],
-        padding: 4,
-        backgroundColor: Colors.surface,
-        borderRadius: BorderRadius.full,
-        elevation: 4,
-        shadowColor: Colors.black,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
     },
-    cameraOverlay: {
+    avatarRing: {
+        padding: 3,
+        borderRadius: 999,
+        backgroundColor: Colors.white,
+        ...Platform.select({
+            ios: {
+                shadowColor: Colors.primary,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.2,
+                shadowRadius: 12,
+            },
+            android: { elevation: 6 },
+        }),
+    },
+    cameraBadge: {
         position: 'absolute',
-        bottom: 4,
-        right: 4,
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        backgroundColor: Colors.surface,
-        borderWidth: 3,
-        borderColor: Colors.surface,
+        bottom: 2,
+        right: 2,
+        width: 28,
+        height: 28,
+        borderRadius: 14,
+        backgroundColor: Colors.primary,
         justifyContent: 'center',
         alignItems: 'center',
-        elevation: 2,
+        borderWidth: 2,
+        borderColor: Colors.white,
     },
-    name: {
-        fontWeight: FontWeight.bold,
+    heroName: {
+        marginBottom: Spacing[1],
         color: Colors.textPrimary,
     },
-    statsRow: {
+    heroEmail: {
+        color: Colors.textSecondary,
+        marginBottom: Spacing[3],
+    },
+    pillRow: {
         flexDirection: 'row',
+        gap: Spacing[2],
+    },
+    pill: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
+        backgroundColor: Colors.primarySubtle,
+        borderRadius: BorderRadius.full,
+        paddingHorizontal: Spacing[3],
+        paddingVertical: Spacing[1],
+    },
+    pillGold: {
+        backgroundColor: '#fffbeb',
+    },
+    pillText: {
+        fontSize: FontSize.xs,
+        color: Colors.primary,
+        fontWeight: FontWeight.semiBold,
+    },
+
+    // ── Stats card ─────────────────────────────────────────────────────────────
+    statsCard: {
+        flexDirection: 'row',
+        marginHorizontal: Layout.screenPaddingH,
+        marginTop: Spacing[4],
+        marginBottom: Spacing[5],
         backgroundColor: Colors.surface,
-        borderRadius: BorderRadius.xl,
+        borderRadius: 20,
         paddingVertical: Spacing[4],
         paddingHorizontal: Spacing[2],
-        marginTop: Spacing[6],
-        width: '100%',
-        elevation: 2,
-        shadowColor: Colors.black,
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
         alignItems: 'center',
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.08,
+                shadowRadius: 8,
+            },
+            android: { elevation: 3 },
+        }),
     },
     statItem: {
         flex: 1,
         alignItems: 'center',
-        gap: 2,
+        gap: 4,
+    },
+    statIconBubble: {
+        width: 40,
+        height: 40,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 2,
+    },
+    statNumber: {
+        fontSize: FontSize.xl,
+        fontWeight: FontWeight.bold,
+        lineHeight: 24,
     },
     statDivider: {
-        width: 1,
-        height: 24,
+        width: StyleSheet.hairlineWidth,
+        height: 60,
         backgroundColor: Colors.border,
     },
-    card: {
-        marginBottom: Spacing[4],
-        marginHorizontal: Layout.screenPaddingH,
-        overflow: 'hidden',
-        borderRadius: BorderRadius.xl,
+
+    // ── Body ─────────────────────────────────────────────────────────────────
+    body: {
+        paddingHorizontal: Layout.screenPaddingH,
+        gap: Spacing[4],
     },
-    // ── Class rows ──────────────────────────────────────────────────────────
+
+    // ── Section card ─────────────────────────────────────────────────────────
+    sectionCard: {
+        backgroundColor: Colors.surface,
+        borderRadius: 16,
+        overflow: 'hidden',
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.06,
+                shadowRadius: 6,
+            },
+            android: { elevation: 2 },
+        }),
+    },
+    sectionHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: Spacing[4],
+        paddingTop: Spacing[4],
+        paddingBottom: Spacing[2],
+    },
+    sectionTitle: {
+        fontSize: FontSize.xs,
+        fontWeight: FontWeight.bold,
+        letterSpacing: 0.8,
+    },
+    sectionBody: {
+        paddingBottom: Spacing[1],
+    },
+
+    // ── Profile row ──────────────────────────────────────────────────────────
+    rowInner: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: Spacing[4],
+        paddingVertical: Spacing[3],
+        minHeight: 60,
+    },
+    rowBorder: {
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderBottomColor: Colors.border,
+    },
+    iconBubble: {
+        width: 36,
+        height: 36,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: Spacing[3],
+        flexShrink: 0,
+    },
+    rowContent: {
+        flex: 1,
+        gap: 2,
+    },
+    rowLabel: {
+        fontSize: FontSize.base,
+        color: Colors.textPrimary,
+    },
+    rowValue: {
+        fontSize: FontSize.xs,
+        color: Colors.textSecondary,
+    },
+    chevron: {
+        marginLeft: Spacing[2],
+    },
+
+    // ── Class rows ───────────────────────────────────────────────────────────
     classRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: Spacing[4],
+        paddingHorizontal: Spacing[4],
+        paddingVertical: Spacing[3],
         gap: Spacing[3],
     },
     classBadge: {
         width: 44,
         height: 44,
-        borderRadius: BorderRadius.lg,
+        borderRadius: 12,
         backgroundColor: Colors.primarySubtle,
         justifyContent: 'center',
         alignItems: 'center',
@@ -456,52 +670,79 @@ const styles = StyleSheet.create({
         fontWeight: FontWeight.bold,
         color: Colors.primary,
     },
-    classInfo: { flex: 1, gap: 2 },
+    classInfo: {
+        flex: 1,
+        gap: 2,
+    },
+    classNameRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: Spacing[2],
+    },
+    ctBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 3,
+        backgroundColor: '#fffbeb',
+        borderRadius: BorderRadius.full,
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+    },
+    ctBadgeText: {
+        fontSize: FontSize.xs,
+        fontWeight: FontWeight.bold,
+        color: '#f59e0b',
+    },
+    subjectText: {
+        color: Colors.primary,
+        fontSize: FontSize.xs,
+        fontWeight: FontWeight.medium,
+    },
+
     // ── Language ─────────────────────────────────────────────────────────────
     langInner: {
-        padding: Spacing[4],
-        gap: Spacing[3],
+        paddingHorizontal: Spacing[4],
+        paddingBottom: Spacing[4],
     },
     langChips: {
         flexDirection: 'row',
-        gap: Spacing[3],
+        flexWrap: 'wrap',
+        gap: Spacing[2],
     },
-    langHint: { marginTop: Spacing[1] },
-    // ── Settings rows ─────────────────────────────────────────────────────────
-    rowIconContainer: {
+
+    // ── Sign out ──────────────────────────────────────────────────────────────
+    signOutBtn: {
+        backgroundColor: Colors.surface,
+        borderRadius: 16,
+        overflow: 'hidden',
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.06,
+                shadowRadius: 6,
+            },
+            android: { elevation: 2 },
+        }),
+    },
+    signOutInner: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: Spacing[4],
+        paddingVertical: Spacing[4],
+    },
+    signOutIcon: {
         width: 36,
         height: 36,
         borderRadius: 10,
+        backgroundColor: '#fef2f2',
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: Spacing[3],
     },
-    rowContent: {
-        flex: 1,
-    },
-    rowLabel: {
-        color: Colors.textPrimary,
-        fontWeight: FontWeight.medium,
-    },
-    // ── Sign out ──────────────────────────────────────────────────────────────
-    signOutWrapper: {
-        marginHorizontal: Layout.screenPaddingH,
-        marginTop: Spacing[2],
-    },
-    signOutRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: Colors.surface,
-        borderRadius: BorderRadius.xl,
-        padding: Spacing[4],
-        elevation: 1,
-        shadowColor: Colors.black,
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 2,
-    },
-    signOutText: {
-        color: Colors.error,
+    signOutLabel: {
+        fontSize: FontSize.base,
         fontWeight: FontWeight.semiBold,
+        color: '#ef4444',
     },
 });

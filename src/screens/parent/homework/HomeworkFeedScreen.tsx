@@ -158,7 +158,7 @@ export function HomeworkFeedScreen() {
                     ) : (
                         <PresetEmptyState
                             preset="homework"
-                            title={pendingOnly ? 'All homework done! 🎉' : 'No homework yet'}
+                            title={pendingOnly ? 'All homework done!' : 'No homework yet'}
                             message={
                                 pendingOnly
                                     ? 'No pending homework for this child.'

@@ -127,6 +127,7 @@ export type ParentNavigatorParamList = {
 
     // ── Profile ───────────────────────────────────────────────────────────────
     ParentProfile: undefined;
+    ChangePassword: undefined;
 };
 
 // ─── Root navigator ───────────────────────────────────────────────────────────

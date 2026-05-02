@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
+import Icon from 'react-native-vector-icons/Ionicons';
 import {
     View,
     ScrollView,
@@ -213,10 +214,10 @@ function MonthNav({ year, month, onChange, lang }: MonthNavProps) {
                 style={navStyles.btn}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-                <AppText style={navStyles.arrow}>‹</AppText>
+                <Icon name="chevron-back" size={24} color={Colors.primary} />
             </TouchableOpacity>
 
-            <AppText variant="subtitle1">
+            <AppText variant="subtitle1" style={navStyles.monthText}>
                 {getLocalizedMonthName(month, lang)} {year}
             </AppText>
 
@@ -226,9 +227,11 @@ function MonthNav({ year, month, onChange, lang }: MonthNavProps) {
                 disabled={isCurrent}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-                <AppText style={[navStyles.arrow, isCurrent && { color: Colors.border }]}>
-                    ›
-                </AppText>
+                <Icon
+                    name="chevron-forward"
+                    size={24}
+                    color={isCurrent ? Colors.border : Colors.primary}
+                />
             </TouchableOpacity>
         </View>
     );
@@ -240,12 +243,19 @@ const navStyles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
     },
-    btn: { padding: Spacing[2] },
+    btn: {
+        padding: Spacing[1],
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: Colors.surfaceSecondary,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     btnDisabled: { opacity: 0.3 },
-    arrow: {
-        fontSize: FontSize.xl,
-        color: Colors.primary,
-        fontWeight: FontWeight.semiBold,
+    monthText: {
+        fontWeight: FontWeight.bold,
+        color: Colors.textPrimary,
     },
 });
 
@@ -265,7 +275,7 @@ export function AttendanceCalendarScreen() {
         data,
         isLoading,
         refetch,
-    } = useGetChildAttendanceHistoryQuery({ studentId });
+    } = useGetChildAttendanceHistoryQuery({ studentId }, { skip: !studentId });
 
     const history = data?.data;
     const allRecords = history?.records ?? [];
@@ -370,8 +380,9 @@ export function AttendanceCalendarScreen() {
                         {/* Threshold warning */}
                         {yearPct != null && yearPct < thresholdPct && (
                             <View style={styles.thresholdWarn}>
+                                <Icon name="warning" size={16} color={Colors.warning} style={{ marginRight: 8 }} />
                                 <AppText style={styles.thresholdText}>
-                                    ⚠️ Below {thresholdPct}% minimum attendance
+                                    Below {thresholdPct}% minimum attendance
                                 </AppText>
                             </View>
                         )}
@@ -486,6 +497,8 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     thresholdWarn: {
+        flexDirection: 'row',
+        alignItems: 'center',
         backgroundColor: Colors.warningLight,
         borderRadius: BorderRadius.lg,
         paddingHorizontal: Spacing[3],

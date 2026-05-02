@@ -167,8 +167,7 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-start',
     },
     fullWidth: {
-        alignSelf: 'auto',
-        width: '100%',
+        alignSelf: 'stretch',
     },
     disabled: {
         backgroundColor: Colors.buttonDisabled,

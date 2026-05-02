@@ -59,6 +59,7 @@ export function ParentHomeScreen() {
         isLoading: todayLoading,
     } = useGetChildTodayAttendanceQuery(activeChildId ?? '', {
         skip: !activeChildId,
+        pollingInterval: 300000, // 5 mins
     });
 
     const {

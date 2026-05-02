@@ -1,4 +1,5 @@
 import React from 'react';
+import Icon from 'react-native-vector-icons/Ionicons';
 import {
     View,
     TouchableOpacity,
@@ -129,7 +130,7 @@ export function TeacherHomeworkCard({
                             accessibilityRole="button"
                             accessibilityLabel="Delete homework"
                         >
-                            <AppText style={styles.deleteIcon}>🗑</AppText>
+                            <Icon name="trash-outline" size={20} color={Colors.error} />
                         </TouchableOpacity>
                     )}
                 </View>
@@ -202,8 +203,14 @@ export function ParentHomeworkCard({
                 {/* Teacher remarks (if graded) */}
                 {teacherRemarks && (
                     <View style={styles.remarksBox}>
+                        <View style={styles.remarksHeader}>
+                            <Icon name="chatbubble-ellipses-outline" size={14} color={Colors.textSecondary} />
+                            <AppText variant="caption" secondary style={{ marginLeft: 4 }}>
+                                Teacher Remarks
+                            </AppText>
+                        </View>
                         <AppText variant="caption" secondary>
-                            💬 {truncate(teacherRemarks, 100)}
+                            {truncate(teacherRemarks, 100)}
                         </AppText>
                     </View>
                 )}
@@ -217,7 +224,10 @@ export function ParentHomeworkCard({
                         accessibilityRole="button"
                         accessibilityLabel="Mark as submitted"
                     >
-                        <AppText style={styles.markDoneText}>✓ Mark as submitted</AppText>
+                        <View style={styles.markDoneInner}>
+                            <Icon name="checkmark-circle-outline" size={18} color={Colors.success} style={{ marginRight: 6 }} />
+                            <AppText style={styles.markDoneText}>Mark as submitted</AppText>
+                        </View>
                     </TouchableOpacity>
                 )}
             </View>
@@ -311,6 +321,11 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.surfaceSecondary,
         borderRadius: BorderRadius.md,
         padding: Spacing[2],
+        gap: 4,
+    },
+    remarksHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     markDoneBtn: {
         backgroundColor: Colors.successLight,
@@ -318,6 +333,10 @@ const styles = StyleSheet.create({
         paddingVertical: Spacing[2],
         alignItems: 'center',
         marginTop: Spacing[1],
+    },
+    markDoneInner: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     markDoneText: {
         fontSize: FontSize.sm,

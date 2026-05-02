@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AppText } from '../components/common/AppText';
 import { CountBadge } from '../components/common/AppBadge';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 // ── Screens ──────────────────────────────────────────────────────────────────
 import { ParentHomeScreen } from '../screens/parent/home/ParentHomeScreen';
@@ -36,6 +37,7 @@ import type {
     ParentNavigatorParamList,
     ParentTabParamList,
 } from './types';
+import { ChangePasswordScreen } from '../screens/auth/ChangePasswordScreen';
 
 // ─── Navigators ───────────────────────────────────────────────────────────────
 
@@ -45,12 +47,12 @@ const Stack = createNativeStackNavigator<ParentNavigatorParamList>();
 // ─── Tab icon ─────────────────────────────────────────────────────────────────
 
 function TabIcon({
-    emoji,
+    iconName,
     label,
     focused,
     badge,
 }: {
-    emoji: string;
+    iconName: string;
     label: string;
     focused: boolean;
     badge?: number;
@@ -58,7 +60,11 @@ function TabIcon({
     return (
         <View style={tabStyles.wrapper}>
             <View style={tabStyles.iconBox}>
-                <AppText style={tabStyles.emoji}>{emoji}</AppText>
+                <Icon
+                    name={focused ? iconName : `${iconName}-outline`}
+                    size={24}
+                    color={focused ? Colors.parent : Colors.tabBarInactive}
+                />
                 {badge ? (
                     <CountBadge count={badge} size="sm" style={tabStyles.badge} />
                 ) : null}
@@ -78,8 +84,7 @@ function TabIcon({
 
 const tabStyles = StyleSheet.create({
     wrapper: { alignItems: 'center', justifyContent: 'center', gap: 2 },
-    iconBox: { position: 'relative' },
-    emoji: { fontSize: 22 },
+    iconBox: { position: 'relative', marginBottom: 2 },
     badge: {
         position: 'absolute',
         top: -4,
@@ -128,7 +133,7 @@ function ParentTabs() {
                 component={ParentHomeScreen}
                 options={{
                     tabBarIcon: ({ focused }) => (
-                        <TabIcon emoji="🏠" label="Home" focused={focused} badge={totalBadge} />
+                        <TabIcon iconName="home" label="Home" focused={focused} badge={totalBadge} />
                     ),
                 }}
             />
@@ -138,7 +143,7 @@ function ParentTabs() {
                 initialParams={{ studentId: activeChild?.studentId ?? '' }}
                 options={{
                     tabBarIcon: ({ focused }) => (
-                        <TabIcon emoji="📅" label="Attendance" focused={focused} />
+                        <TabIcon iconName="calendar" label="Attendance" focused={focused} />
                     ),
                 }}
             />
@@ -147,7 +152,7 @@ function ParentTabs() {
                 component={HomeworkFeedScreen}
                 options={{
                     tabBarIcon: ({ focused }) => (
-                        <TabIcon emoji="📚" label="Homework" focused={focused} />
+                        <TabIcon iconName="book" label="Homework" focused={focused} />
                     ),
                 }}
             />
@@ -157,7 +162,7 @@ function ParentTabs() {
                 initialParams={{ studentId: activeChild?.studentId ?? '' }}
                 options={{
                     tabBarIcon: ({ focused }) => (
-                        <TabIcon emoji="📊" label="Results" focused={focused} />
+                        <TabIcon iconName="stats-chart" label="Results" focused={focused} />
                     ),
                 }}
             />
@@ -166,7 +171,7 @@ function ParentTabs() {
                 component={ParentProfileScreen}
                 options={{
                     tabBarIcon: ({ focused }) => (
-                        <TabIcon emoji="👤" label="Profile" focused={focused} />
+                        <TabIcon iconName="person" label="Profile" focused={focused} />
                     ),
                 }}
             />
@@ -280,6 +285,11 @@ export function ParentNavigator() {
                 name="ParentProfile"
                 component={ParentProfileScreen}
                 options={{ title: 'Profile' }}
+            />
+            <Stack.Screen
+                name="ChangePassword"
+                component={ChangePasswordScreen}
+                options={{ title: 'Change Password' }}
             />
         </Stack.Navigator>
     );

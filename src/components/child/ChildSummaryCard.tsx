@@ -12,6 +12,7 @@ import { AppCard } from '../common/AppCard';
 import {
     TodayStatusBadge,
 } from '../attendance/AttendanceStatusBadge';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { Colors } from '../../constants/colors';
 import { BorderRadius, Spacing, IconSize } from '../../constants/spacing';
 import { FontSize, FontWeight } from '../../constants/typography';
@@ -90,7 +91,8 @@ export function ChildSummaryCard({
 
                 {/* Attendance % */}
                 <StatTile
-                    emoji="📅"
+                    icon="calendar"
+                    iconColor="#3b82f6"
                     label="Attendance"
                     value={
                         attendancePct !== null && attendancePct !== undefined
@@ -110,7 +112,8 @@ export function ChildSummaryCard({
                 {/* Pending homework */}
                 <StatTileDivider />
                 <StatTile
-                    emoji="📚"
+                    icon="book"
+                    iconColor="#f59e0b"
                     label="Homework"
                     value={pendingHomework > 0 ? `${pendingHomework} pending` : 'All done'}
                     valueColor={pendingHomework > 0 ? Colors.warning : Colors.success}
@@ -120,7 +123,8 @@ export function ChildSummaryCard({
                 {/* Latest result */}
                 <StatTileDivider />
                 <StatTile
-                    emoji="📊"
+                    icon="stats-chart"
+                    iconColor="#8b5cf6"
                     label="Results"
                     value={
                         summary?.recentMarks?.[0]
@@ -135,8 +139,9 @@ export function ChildSummaryCard({
             {/* Unread announcements banner */}
             {unreadAnnouncements > 0 && (
                 <View style={styles.announcementBanner}>
+                    <Icon name="megaphone" size={16} color={Colors.primary} style={{ marginRight: 6 }} />
                     <AppText style={styles.announcementText}>
-                        📣 {unreadAnnouncements} new announcement
+                        {unreadAnnouncements} new announcement
                         {unreadAnnouncements > 1 ? 's' : ''}
                     </AppText>
                 </View>
@@ -148,17 +153,23 @@ export function ChildSummaryCard({
 // ─── Stat tile ────────────────────────────────────────────────────────────────
 
 interface StatTileProps {
-    emoji: string;
+    icon: string;
     label: string;
     value: string;
+    iconColor?: string;
     valueColor?: string;
     onPress?: () => void;
 }
 
-function StatTile({ emoji, label, value, valueColor, onPress }: StatTileProps) {
+function StatTile({ icon, label, value, iconColor, valueColor, onPress }: StatTileProps) {
     const content = (
         <View style={styles.statTile}>
-            <AppText style={styles.statEmoji}>{emoji}</AppText>
+            <Icon
+                name={icon}
+                size={22}
+                color={iconColor ?? Colors.parent}
+                style={styles.statIcon}
+            />
             <AppText
                 style={[styles.statValue, valueColor ? { color: valueColor } : undefined]}
                 numberOfLines={1}
@@ -263,9 +274,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: Spacing[2],
     },
-    statEmoji: {
-        fontSize: 20,
-        marginBottom: Spacing[0.5],
+    statIcon: {
+        marginBottom: Spacing[1],
     },
     statValue: {
         fontSize: FontSize.base,
@@ -280,6 +290,8 @@ const styles = StyleSheet.create({
         marginVertical: Spacing[2],
     },
     announcementBanner: {
+        flexDirection: 'row',
+        alignItems: 'center',
         backgroundColor: Colors.primarySubtle,
         borderTopWidth: StyleSheet.hairlineWidth,
         borderTopColor: Colors.primaryBorder,
@@ -289,6 +301,7 @@ const styles = StyleSheet.create({
         borderBottomRightRadius: BorderRadius.xl,
     },
     announcementText: {
+        flex: 1,
         fontSize: FontSize.sm,
         color: Colors.primary,
         fontWeight: FontWeight.medium,

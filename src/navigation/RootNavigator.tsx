@@ -18,6 +18,7 @@ import { ParentNavigator } from './ParentNavigator';
 import { AppModal } from '../components/common/AppModal';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
 import { useNotifications } from '../hooks/useNotifications';
+import { useHydrateProfile } from '../hooks/useHydrateProfile';
 import linking from './linking';
 import { Colors } from '../constants/colors';
 import type { RootStackParamList } from './types';
@@ -51,6 +52,9 @@ function AppNavigator() {
 
     // Network status subscription — sets isOnline, flushes offline queue on reconnect
     useNetworkStatus();
+
+    // Hydrate profile if authenticated (name, photo, children)
+    useHydrateProfile();
 
     // Show splash while checking stored tokens
     if (isBootstrapping) return <BootstrapScreen />;

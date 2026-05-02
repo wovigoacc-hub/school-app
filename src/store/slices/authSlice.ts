@@ -153,13 +153,15 @@ const authSlice = createSlice({
             action: PayloadAction<{
                 firstName?: string;
                 lastName?: string;
+                email?: string;
                 photoUrl?: string;
                 preferredLang?: string;
             }>,
         ) => {
-            const { firstName, lastName, photoUrl, preferredLang } = action.payload;
+            const { firstName, lastName, email, photoUrl, preferredLang } = action.payload;
             if (firstName !== undefined) state.firstName = firstName;
             if (lastName !== undefined) state.lastName = lastName;
+            if (email !== undefined) state.email = email;
             if (photoUrl !== undefined) state.photoUrl = photoUrl;
             if (preferredLang !== undefined) {
                 state.preferredLang = preferredLang;
