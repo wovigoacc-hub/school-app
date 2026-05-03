@@ -45,7 +45,7 @@ export function SectionHeader({
                     {title}
                 </AppText>
                 {count !== undefined && count > 0 && (
-                    <CountBadge count={count} size="sm" style={styles.badge} />
+                    <CountBadge count={count} size="md" style={styles.badge} />
                 )}
             </View>
 
