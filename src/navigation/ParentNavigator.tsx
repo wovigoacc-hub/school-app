@@ -15,6 +15,7 @@ import { HomeworkDetailScreen } from '../screens/parent/homework/HomeworkDetailS
 import { ExamListScreen } from '../screens/parent/results/ExamListScreen';
 import { ExamResultScreen } from '../screens/parent/results/ExamResultScreen';
 import { AnnouncementFeedScreen } from '../screens/parent/announcements/AnnouncementFeedScreen';
+import { AnnouncementDetailScreen } from '../screens/common/announcements/AnnouncementDetailScreen';
 import { RequestListScreen } from '../screens/parent/requests/RequestListScreen';
 import { RequestCreateScreen } from '../screens/parent/requests/RequestCreateScreen';
 import { RequestDetailScreen } from '../screens/parent/requests/RequestDetailScreen';
@@ -102,9 +103,6 @@ const ProgressChartPlaceholder = () => {
     // TODO: replace with ProgressChartScreen component
     return <ExamListScreen />;
 };
-
-// ─── Placeholder for AnnouncementDetail ──────────────────────────────────────
-const AnnouncementDetailPlaceholder = () => <AnnouncementFeedScreen />;
 
 // ─── Parent tab navigator ─────────────────────────────────────────────────────
 
@@ -252,8 +250,8 @@ export function ParentNavigator() {
             />
             <Stack.Screen
                 name="AnnouncementDetail"
-                component={AnnouncementDetailPlaceholder}
-                options={{ title: 'Announcement' }}
+                component={AnnouncementDetailScreen}
+                options={{ headerShown: false }}
             />
 
             {/* Requests */}

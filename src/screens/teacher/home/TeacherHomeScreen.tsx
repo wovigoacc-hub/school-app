@@ -21,6 +21,11 @@ import { useAuth } from '../../../hooks/useAuth';
 import { useGetMyClassesQuery } from '../../../services/teacher/classes.service';
 import { useGetOpenExamsQuery } from '../../../services/teacher/exams.service';
 import { useGetTeacherHomeworkQuery } from '../../../services/teacher/homework.service';
+import {
+    useGetTeacherAnnouncementFeedQuery,
+    useMarkTeacherAnnouncementsReadMutation,
+} from '../../../services/teacher/announcements.service';
+import { EmergencyBannerList } from '../../../components/announcements/EmergencyBanner';
 import { Colors } from '../../../constants/colors';
 import { BorderRadius, Spacing, Layout } from '../../../constants/spacing';
 import { FontSize, FontWeight } from '../../../constants/typography';
@@ -139,13 +144,27 @@ export function TeacherHomeScreen() {
         refetch: refetchHomework,
     } = useGetTeacherHomeworkQuery({ overdue: true, limit: 5 });
 
+    const {
+        data: announcementData,
+        refetch: refetchAnnouncements,
+    } = useGetTeacherAnnouncementFeedQuery({ limit: 5 });
+
+    const [markRead] = useMarkTeacherAnnouncementsReadMutation();
+
     const classes = classesData?.data ?? [];
     const openExams = examsData?.data ?? [];
     const overdueHW = homeworkData?.data ?? [];
+    const announcements = announcementData?.data ?? [];
+    const emergencies = announcements.filter((a) => a.isEmergency && !a.isArchived);
 
     const refetchAll = useCallback(async () => {
-        await Promise.all([refetchClasses(), refetchExams(), refetchHomework()]);
-    }, [refetchClasses, refetchExams, refetchHomework]);
+        await Promise.all([
+            refetchClasses(),
+            refetchExams(),
+            refetchHomework(),
+            refetchAnnouncements(),
+        ]);
+    }, [refetchClasses, refetchExams, refetchHomework, refetchAnnouncements]);
 
     const { refreshing, onRefresh } = useRefresh(refetchAll);
 
@@ -157,6 +176,16 @@ export function TeacherHomeScreen() {
 
     const renderHeader = useCallback(() => (
         <View>
+            {/* Emergency banners */}
+            {emergencies.length > 0 && (
+                <EmergencyBannerList
+                    announcements={emergencies}
+                    onPress={(a) => navigation.navigate('AnnouncementDetail', { announcementId: a.id })}
+                    onDismiss={(id) => markRead({ announcementIds: [id] })}
+                    style={styles.emergencies}
+                />
+            )}
+
             {/* Greeting */}
             <View style={styles.greeting}>
                 <View style={styles.greetingText}>
@@ -243,7 +272,7 @@ export function TeacherHomeScreen() {
                     iconName="megaphone-outline"
                     iconColor={Colors.parent}
                     label="Announce"
-                    onPress={() => navigation.navigate('AnnouncementFeed')}
+                    onPress={() => navigation.navigate('Announcements')}
                 />
             </View>
 
@@ -361,8 +390,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingTop: Spacing[5],
+        paddingTop: Spacing[4],
         marginBottom: Spacing[5],
+    },
+    emergencies: {
+        marginBottom: Spacing[2],
     },
     greetingText: { flex: 1, marginRight: Spacing[3] },
     taskCard: {

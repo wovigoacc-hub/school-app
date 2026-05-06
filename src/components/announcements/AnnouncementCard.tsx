@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
     View,
     TouchableOpacity,
@@ -103,14 +104,24 @@ export function AnnouncementCard({
                 </View>
 
                 {/* Title */}
-                <AppText
-                    variant="subtitle1"
-                    bold={isUnread}
-                    style={[styles.title, isEmergency && styles.titleEmergency]}
-                    numberOfLines={expanded ? undefined : 2}
-                >
-                    {isEmergency ? '🚨 ' : ''}{title}
-                </AppText>
+                <View style={styles.titleRow}>
+                    {isEmergency && (
+                        <Ionicons
+                            name="notifications"
+                            size={18}
+                            color={Colors.error}
+                            style={styles.emergencyIcon}
+                        />
+                    )}
+                    <AppText
+                        variant="subtitle1"
+                        bold={isUnread}
+                        style={[styles.title, isEmergency && styles.titleEmergency]}
+                        numberOfLines={expanded ? undefined : 2}
+                    >
+                        {title}
+                    </AppText>
+                </View>
 
                 {/* Body preview or full */}
                 <AppText
@@ -178,7 +189,15 @@ const styles = StyleSheet.create({
     unreadDot: {
         marginLeft: Spacing[2],
     },
+    titleRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    emergencyIcon: {
+        marginRight: Spacing[1.5],
+    },
     title: {
+        flex: 1,
         lineHeight: 22,
     },
     titleEmergency: {

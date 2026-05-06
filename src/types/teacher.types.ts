@@ -53,6 +53,7 @@ export interface TeacherClass {
         subjectId: string;
         subjectName: string;
     }>;
+    attendanceMode: 'ONCE_DAILY' | 'PERIOD_WISE';
 }
 
 // ─── Pending tasks (home screen alerts) ──────────────────────────────────────

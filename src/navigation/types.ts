@@ -65,7 +65,7 @@ export type TeacherNavigatorParamList = {
     Marks: { examId: string };
 
     // ── Announcements ─────────────────────────────────────────────────────────
-    AnnouncementFeed: undefined;
+    Announcements: undefined;
     AnnouncementDetail: { announcementId: string };
     AnnouncementCreate: undefined;
 

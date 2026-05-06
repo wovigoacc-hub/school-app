@@ -4,6 +4,7 @@ import {
     View,
     StyleSheet,
     type ViewStyle,
+    type TextStyle,
 } from 'react-native';
 import { AppText } from './AppText';
 import { Colors } from '../../constants/colors';
@@ -21,6 +22,7 @@ interface AppChipProps {
     rightIcon?: React.ReactNode;
     style?: ViewStyle;
     size?: 'sm' | 'md';
+    labelStyle?: TextStyle;
 }
 
 export function AppChip({
@@ -32,6 +34,7 @@ export function AppChip({
     rightIcon,
     style,
     size = 'md',
+    labelStyle,
 }: AppChipProps) {
     const isSmall = size === 'sm';
 
@@ -58,6 +61,7 @@ export function AppChip({
                     styles.label,
                     isSmall ? styles.labelSm : styles.labelMd,
                     selected ? styles.labelSelected : styles.labelDefault,
+                    labelStyle,
                 ]}
                 numberOfLines={1}
             >

@@ -32,6 +32,8 @@ interface StudentAttendanceRowProps {
     locked?: boolean;
     /** Show roll number */
     showRoll?: boolean;
+    /** Whether we are marking a specific subject period */
+    isSubjectMode?: boolean;
     style?: ViewStyle;
 }
 
@@ -42,16 +44,23 @@ export function StudentAttendanceRow({
     onChange,
     locked = false,
     showRoll = true,
+    isSubjectMode = false,
     style,
 }: StudentAttendanceRowProps) {
     const { studentId, studentName, rollNumber, photoUrl, status, isLeave } = mark;
 
+    // Filter statuses based on mode
+    const availableStatuses = isSubjectMode
+        ? STATUS_CYCLE_ORDER.filter((s) => s !== 'HALF_DAY')
+        : STATUS_CYCLE_ORDER;
+
     // Tap anywhere on the row to cycle the status
     const handleRowTap = useCallback(() => {
         if (locked || isLeave) return;
-        const next = cycleStatus(status);
+        const index = availableStatuses.indexOf(status);
+        const next = availableStatuses[(index + 1) % availableStatuses.length];
         onChange(studentId, next);
-    }, [locked, isLeave, status, studentId, onChange]);
+    }, [locked, isLeave, status, studentId, onChange, availableStatuses]);
 
     // Individual status button tap — jump directly to that status
     const handleStatusTap = useCallback(
@@ -126,6 +135,7 @@ export function StudentAttendanceRow({
                 <StatusButtonRow
                     selected={status}
                     onSelect={handleStatusTap}
+                    statuses={availableStatuses}
                 />
             )}
         </TouchableOpacity>
@@ -137,12 +147,13 @@ export function StudentAttendanceRow({
 interface StatusButtonRowProps {
     selected: AttendanceStatus;
     onSelect: (status: AttendanceStatus) => void;
+    statuses: AttendanceStatus[];
 }
 
-function StatusButtonRow({ selected, onSelect }: StatusButtonRowProps) {
+function StatusButtonRow({ selected, onSelect, statuses }: StatusButtonRowProps) {
     return (
         <View style={styles.statusButtons}>
-            {STATUS_CYCLE_ORDER.map((s) => {
+            {statuses.map((s) => {
                 const isActive = selected === s;
                 return (
                     <TouchableOpacity

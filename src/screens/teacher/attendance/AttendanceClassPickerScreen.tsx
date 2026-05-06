@@ -27,12 +27,12 @@ import type { TeacherNavigatorParamList } from '../../../navigation/types';
 
 type Nav = NativeStackNavigationProp<TeacherNavigatorParamList>;
 
-// ─── Submission status for a class today ─────────────────────────────────────
+// ─── Submission status for a class today ──────────────────────────────────────
 
 const SUBMISSION_CONFIG = {
     submitted: { icon: '✓', label: 'Marked', colour: Colors.success, bg: Colors.successLight },
-    partial: { icon: '◑', label: 'Partial', colour: Colors.warning, bg: Colors.warningLight },
-    pending: { icon: '○', label: 'Not marked', colour: Colors.textTertiary, bg: Colors.surfaceSecondary },
+    partial: { icon: '•', label: 'Partial', colour: Colors.warning, bg: Colors.warningLight },
+    pending: { icon: '•', label: 'Not marked', colour: Colors.textTertiary, bg: Colors.surfaceSecondary },
 } as const;
 
 // ─── Class row ────────────────────────────────────────────────────────────────
@@ -44,20 +44,8 @@ interface ClassAttendanceRowProps {
 }
 
 function ClassAttendanceRow({ cls, date, onPress }: ClassAttendanceRowProps) {
-    // For ONCE_DAILY: one tap goes straight to mark screen
-    // For multiple subjects: show each subject as a sub-row
-
-    const handlePress = useCallback(() => {
-        if (cls.mySubjects.length === 1) {
-            onPress(cls.classId, cls.mySubjects[0].subjectId);
-        } else {
-            onPress(cls.classId);
-        }
-    }, [cls, onPress]);
-
     return (
         <AppCard
-            onPress={handlePress}
             noPadding
             style={styles.classCard}
         >
@@ -76,43 +64,97 @@ function ClassAttendanceRow({ cls, date, onPress }: ClassAttendanceRowProps) {
                     </AppText>
                     <AppText variant="caption" secondary>
                         {cls.studentCount} students
-                        {cls.isClassTeacher ? ' · Class Teacher' : ''}
+                        {cls.isClassTeacher ? ' • Class Teacher' : ''}
                     </AppText>
                 </View>
-
-                {/* Subject count or chevron */}
-                {cls.mySubjects.length > 1 ? (
-                    <View style={styles.subjectCount}>
-                        <AppText style={styles.subjectCountText}>
-                            {cls.mySubjects.length} subjects
-                        </AppText>
-                    </View>
-                ) : (
-                    <AppText style={styles.chevron} secondary>›</AppText>
-                )}
             </View>
 
-            {/* Subject rows for period-wise */}
-            {cls.mySubjects.length > 1 && (
-                <View style={styles.subjectList}>
-                    {cls.mySubjects.map((subj, i) => (
-                        <SubjectRow
-                            key={subj.subjectId}
-                            subjectId={subj.subjectId}
-                            subjectName={subj.subjectName}
-                            classId={cls.classId}
-                            date={date}
-                            isLast={i === cls.mySubjects.length - 1}
-                            onPress={() => onPress(cls.classId, subj.subjectId)}
-                        />
-                    ))}
-                </View>
-            )}
+            <View style={styles.subjectList}>
+                {/* 1. Always show Daily Attendance option if they are class teacher or in ONCE_DAILY mode */}
+                {(cls.isClassTeacher || cls.attendanceMode === 'ONCE_DAILY') && (
+                    <DailyAttendanceRow
+                        classId={cls.classId}
+                        date={date}
+                        onPress={() => onPress(cls.classId)}
+                    />
+                )}
+
+                {/* 2. List of Subjects */}
+                {cls.mySubjects.map((subj, i) => (
+                    <SubjectRow
+                        key={subj.subjectId}
+                        subjectId={subj.subjectId}
+                        subjectName={subj.subjectName}
+                        classId={cls.classId}
+                        date={date}
+                        isLast={i === cls.mySubjects.length - 1}
+                        onPress={() => onPress(cls.classId, subj.subjectId)}
+                    />
+                ))}
+            </View>
         </AppCard>
     );
 }
 
-// ─── Subject row (period-wise mode) ──────────────────────────────────────────
+// ─── Daily attendance row ───────────────────────────────────────────────────
+
+interface DailyAttendanceRowProps {
+    classId: string;
+    date: string;
+    onPress: () => void;
+}
+
+function DailyAttendanceRow({ classId, date, onPress }: DailyAttendanceRowProps) {
+    const { data: sessionData } = useGetAttendanceSessionQuery({
+        classId,
+        date,
+    });
+
+    const session = sessionData?.data;
+    const isSubmitted = !!session?.isSubmitted;
+    const presentCount = session?.presentCount ?? 0;
+    const totalCount = session?.totalStudents ?? 0;
+
+    const statusConfig = isSubmitted
+        ? SUBMISSION_CONFIG.submitted
+        : SUBMISSION_CONFIG.pending;
+
+    return (
+        <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={onPress}
+            style={[styles.subjectRow, styles.subjectRowBorder]}
+            accessibilityRole="button"
+            accessibilityLabel="Daily attendance"
+        >
+            <View style={styles.dailyIcon}>
+                <AppText style={styles.dailyIconText}>📅</AppText>
+            </View>
+            <AppText variant="body2" style={[styles.subjectName, { fontWeight: FontWeight.semiBold }]}>
+                Daily Attendance
+            </AppText>
+
+            <View style={styles.subjectStatus}>
+                {isSubmitted && (
+                    <AppText variant="caption" tertiary>
+                        {presentCount}/{totalCount}
+                    </AppText>
+                )}
+                <View style={[styles.statusPill, { backgroundColor: statusConfig.bg }]}>
+                    <AppText style={[styles.statusIcon, { color: statusConfig.colour }]}>
+                        {statusConfig.icon}
+                    </AppText>
+                    <AppText style={[styles.statusLabel, { color: statusConfig.colour }]}>
+                        {statusConfig.label}
+                    </AppText>
+                </View>
+                <AppText secondary style={styles.subjectChevron}>›</AppText>
+            </View>
+        </TouchableOpacity>
+    );
+}
+
+// ─── Subject row (period-wise mode) ───────────────────────────────────────────
 
 interface SubjectRowProps {
     subjectId: string;
@@ -337,6 +379,18 @@ const styles = StyleSheet.create({
         fontWeight: FontWeight.semiBold,
     },
     subjectChevron: { fontSize: FontSize.lg },
+    dailyIcon: {
+        width: 32,
+        height: 32,
+        borderRadius: BorderRadius.md,
+        backgroundColor: Colors.successLight,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: Spacing[3],
+    },
+    dailyIconText: {
+        fontSize: FontSize.lg,
+    },
     separator: { height: Spacing[2] },
     skeleton: { paddingHorizontal: Layout.screenPaddingH },
 });

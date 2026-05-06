@@ -184,9 +184,10 @@ export function AttendanceMarkScreen() {
                 onChange={handleStatusChange}
                 locked={isAlreadySubmitted && !isDirty}
                 showRoll
+                isSubjectMode={!!subjectId}
             />
         ),
-        [handleStatusChange, isAlreadySubmitted, isDirty],
+        [handleStatusChange, isAlreadySubmitted, isDirty, subjectId],
     );
 
     const ListHeader = useMemo(
@@ -194,7 +195,20 @@ export function AttendanceMarkScreen() {
             <View>
                 {/* Date + subject header */}
                 <View style={styles.header}>
-                    <AppText variant="h4">{session?.className ?? ''} {session?.section ?? ''}</AppText>
+                    <View style={styles.headerTop}>
+                        <AppText variant="h4">{session?.className ?? ''} {session?.section ?? ''}</AppText>
+                        <View style={[
+                            styles.modeBadge,
+                            { backgroundColor: subjectId ? Colors.primarySubtle : Colors.successLight }
+                        ]}>
+                            <AppText style={[
+                                styles.modeBadgeText,
+                                { color: subjectId ? Colors.primary : Colors.success }
+                            ]}>
+                                {subjectId ? 'Subject Mode' : 'Daily Mode'}
+                            </AppText>
+                        </View>
+                    </View>
                     <AppText variant="body2" secondary>
                         {formatDateFull(date)}
                         {subjectId && session?.subjectName ? ` · ${session.subjectName}` : ''}
@@ -319,6 +333,21 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.surface,
         borderBottomWidth: StyleSheet.hairlineWidth,
         borderBottomColor: Colors.border,
+    },
+    headerTop: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    modeBadge: {
+        paddingHorizontal: Spacing[2],
+        paddingVertical: 2,
+        borderRadius: BorderRadius.sm,
+    },
+    modeBadgeText: {
+        fontSize: 10,
+        fontWeight: FontWeight.bold,
+        textTransform: 'uppercase',
     },
     summary: {
         paddingHorizontal: Layout.screenPaddingH,

@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
     View,
     FlatList,
@@ -31,7 +32,7 @@ type Nav = NativeStackNavigationProp<ParentNavigatorParamList>;
 
 type TypeFilter = 'ALL' | AnnouncementType;
 
-const TYPE_CHIPS: Array<{ value: TypeFilter; label: string }> = [
+const TYPE_CHIPS: Array<{ value: TypeFilter; label: string; icon?: string }> = [
     { value: 'ALL', label: 'All' },
     { value: 'CIRCULAR', label: 'Circular' },
     { value: 'EXAM_SCHEDULE', label: 'Exam' },
@@ -39,7 +40,7 @@ const TYPE_CHIPS: Array<{ value: TypeFilter; label: string }> = [
     { value: 'HOLIDAY', label: 'Holiday' },
     { value: 'PARENT_MEETING', label: 'Meeting' },
     { value: 'GENERAL', label: 'General' },
-    { value: 'EMERGENCY', label: '🚨 Emergency' },
+    { value: 'EMERGENCY', label: 'Emergency', icon: 'notifications' },
 ];
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
@@ -94,7 +95,6 @@ export function AnnouncementFeedScreen() {
                 announcement={item}
                 onPress={() => handlePress(item)}
                 onMarkRead={handleMarkRead}
-                expandable
                 style={styles.card}
             />
         ),
@@ -144,6 +144,13 @@ export function AnnouncementFeedScreen() {
                                         selected={typeFilter === chip.value}
                                         onPress={() => setTypeFilter(chip.value)}
                                         size="sm"
+                                        leftIcon={chip.icon ? (
+                                            <Ionicons
+                                                name={chip.icon}
+                                                size={12}
+                                                color={typeFilter === chip.value ? Colors.primary : Colors.error}
+                                            />
+                                        ) : undefined}
                                     />
                                 ))}
                             </View>

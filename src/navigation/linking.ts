@@ -36,7 +36,7 @@ const linking: LinkingOptions<RootStackParamList> = {
                     ExamList: 'teacher/marks/exams',
                     MarkSheet: 'teacher/marks/sheet/:examId/:subjectId/:classId',
                     Marks: 'teacher/marks/:examId',
-                    AnnouncementFeed: 'teacher/announcements',
+                    Announcements: 'teacher/announcements',
                     AnnouncementDetail: 'teacher/announcements/:announcementId',
                     AnnouncementCreate: 'teacher/announcements/create',
                     RequestList: 'teacher/requests',

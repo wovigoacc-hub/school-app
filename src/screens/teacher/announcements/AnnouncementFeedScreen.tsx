@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
     View,
     FlatList,
@@ -31,7 +32,7 @@ type Nav = NativeStackNavigationProp<TeacherNavigatorParamList>;
 
 type TypeFilter = 'ALL' | AnnouncementType;
 
-const TYPE_CHIPS: Array<{ value: TypeFilter; label: string }> = [
+const TYPE_CHIPS: Array<{ value: TypeFilter; label: string; icon?: string }> = [
     { value: 'ALL', label: 'All' },
     { value: 'GENERAL', label: 'General' },
     { value: 'CIRCULAR', label: 'Circular' },
@@ -39,7 +40,7 @@ const TYPE_CHIPS: Array<{ value: TypeFilter; label: string }> = [
     { value: 'EVENT', label: 'Event' },
     { value: 'HOLIDAY', label: 'Holiday' },
     { value: 'PARENT_MEETING', label: 'Meeting' },
-    { value: 'EMERGENCY', label: '🚨 Emergency' },
+    { value: 'EMERGENCY', label: 'Emergency', icon: 'notifications' },
 ];
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
@@ -151,6 +152,13 @@ export function AnnouncementFeedScreen() {
                             selected={typeFilter === chip.value}
                             onPress={() => setTypeFilter(chip.value)}
                             size="sm"
+                            leftIcon={chip.icon ? (
+                                <Ionicons
+                                    name={chip.icon}
+                                    size={12}
+                                    color={typeFilter === chip.value ? Colors.primary : Colors.error}
+                                />
+                            ) : undefined}
                         />
                     ))}
                 </View>
@@ -206,6 +214,7 @@ export function AnnouncementFeedScreen() {
                     selected
                     onPress={() => navigation.navigate('AnnouncementCreate')}
                     style={styles.fabChip}
+                    labelStyle={{ color: Colors.white }}
                 />
             </View>
         </ScreenWrapper>

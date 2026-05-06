@@ -9,11 +9,12 @@ import {
 } from 'react-native';
 import { AppText } from '../common/AppText';
 import { Colors } from '../../constants/colors';
-import { Spacing, Layout } from '../../constants/spacing';
+import { Spacing, Layout, BorderRadius } from '../../constants/spacing';
 import { FontSize, FontWeight } from '../../constants/typography';
 import { formatRelative } from '../../utils/date.utils';
 import { truncate } from '../../utils/format.utils';
 import type { Announcement } from '../../types/announcement.types';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 // ─── Single emergency banner ──────────────────────────────────────────────────
 
@@ -52,7 +53,6 @@ export function EmergencyBanner({
     }, [slideAnim, opacityAnim]);
 
     const handleDismiss = () => {
-        // Slide out animation before unmounting
         Animated.parallel([
             Animated.timing(slideAnim, {
                 toValue: 0,
@@ -74,7 +74,7 @@ export function EmergencyBanner({
 
     const translateY = slideAnim.interpolate({
         inputRange: [0, 1],
-        outputRange: [-60, 0],
+        outputRange: [-80, 0],
     });
 
     return (
@@ -86,52 +86,51 @@ export function EmergencyBanner({
             ]}
             accessibilityRole="alert"
             accessibilityLiveRegion="assertive"
-            accessibilityLabel={`Emergency: ${announcement.title}`}
         >
             <TouchableOpacity
-                activeOpacity={0.9}
+                activeOpacity={0.95}
                 onPress={onPress}
                 style={styles.pressable}
-                accessibilityRole="button"
-                accessibilityHint="Tap for full details"
             >
-                {/* Left: icon + content */}
-                <View style={styles.left}>
-                    <AppText style={styles.icon}>🚨</AppText>
-                    <View style={styles.textBlock}>
+                {/* Left: icon with circular background */}
+                <View style={styles.iconWrapper}>
+                    <Ionicons name="alert-circle" size={24} color="#fff" />
+                </View>
+
+                {/* Content */}
+                <View style={styles.content}>
+                    <View style={styles.header}>
                         <AppText style={styles.title} numberOfLines={1}>
                             {announcement.title}
                         </AppText>
-                        <AppText style={styles.body} numberOfLines={2}>
-                            {truncate(announcement.body, 120)}
-                        </AppText>
                         <AppText style={styles.meta}>
-                            {announcement.authorName} · {formatRelative(announcement.publishedAt)}
+                            {formatRelative(announcement.publishedAt)}
                         </AppText>
                     </View>
+                    <AppText style={styles.body} numberOfLines={2}>
+                        {truncate(announcement.body, 100)}
+                    </AppText>
                 </View>
 
-                {/* Right: dismiss */}
+                {/* Right: dismiss icon */}
                 {onDismiss && (
                     <TouchableOpacity
                         onPress={handleDismiss}
-                        style={styles.dismissButton}
-                        hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-                        accessibilityRole="button"
-                        accessibilityLabel="Dismiss emergency notice"
+                        style={styles.dismiss}
+                        hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
                     >
-                        <AppText style={styles.dismissIcon}>✕</AppText>
+                        <Ionicons name="close" size={20} color="rgba(255,255,255,0.6)" />
                     </TouchableOpacity>
                 )}
             </TouchableOpacity>
 
-            {/* Pulsing bottom border accent */}
+            {/* Bottom accent line */}
             <View style={styles.accentBar} />
         </Animated.View>
     );
 }
 
-// ─── Emergency banner list (stacked, max 3) ───────────────────────────────────
+// ─── Emergency banner list (stacked) ──────────────────────────────────────────
 
 interface EmergencyBannerListProps {
     announcements: Announcement[];
@@ -148,7 +147,7 @@ export function EmergencyBannerList({
 }: EmergencyBannerListProps) {
     const emergencies = announcements
         .filter((a) => a.isEmergency && !a.isArchived)
-        .slice(0, 3); // cap at 3
+        .slice(0, 3);
 
     if (!emergencies.length) return null;
 
@@ -181,13 +180,14 @@ export function EmergencyNotice({ announcement, onPress }: EmergencyNoticeProps)
             onPress={onPress}
             style={styles.notice}
             accessibilityRole="button"
-            accessibilityLabel={`Emergency notice: ${announcement.title}`}
         >
-            <AppText style={styles.noticeIcon}>🚨</AppText>
+            <View style={styles.noticeIconWrapper}>
+                <Ionicons name="flash" size={16} color={Colors.error} />
+            </View>
             <AppText style={styles.noticeText} numberOfLines={1}>
-                {announcement.title}
+                Emergency: {announcement.title}
             </AppText>
-            <AppText style={styles.noticeArrow}>›</AppText>
+            <Ionicons name="chevron-forward" size={16} color={Colors.error} />
         </TouchableOpacity>
     );
 }
@@ -196,76 +196,91 @@ export function EmergencyNotice({ announcement, onPress }: EmergencyNoticeProps)
 
 const styles = StyleSheet.create({
     banner: {
-        backgroundColor: '#7f1d1d',   // dark red — high contrast for emergency
+        backgroundColor: '#991b1b', // richer dark red
         overflow: 'hidden',
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(255,255,255,0.1)',
     },
     pressable: {
         flexDirection: 'row',
-        alignItems: 'flex-start',
+        alignItems: 'center',
         paddingHorizontal: Layout.screenPaddingH,
-        paddingVertical: Spacing[3],
+        paddingVertical: Spacing[4],
+        gap: Spacing[3],
     },
-    left: {
+    iconWrapper: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: 'rgba(255,255,255,0.15)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    content: {
         flex: 1,
+    },
+    header: {
         flexDirection: 'row',
-        alignItems: 'flex-start',
-    },
-    icon: {
-        fontSize: 22,
-        marginRight: Spacing[3],
-        marginTop: 2,
-    },
-    textBlock: {
-        flex: 1,
-        gap: 2,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 2,
     },
     title: {
         fontSize: FontSize.base,
         fontWeight: FontWeight.bold,
-        color: Colors.white,
+        color: '#ffffff',
+        flex: 1,
+        marginRight: Spacing[2],
+    },
+    meta: {
+        fontSize: 11,
+        color: 'rgba(255,255,255,0.5)',
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
     },
     body: {
         fontSize: FontSize.sm,
-        color: 'rgba(255,255,255,0.85)',
+        color: 'rgba(255,255,255,0.8)',
         lineHeight: 18,
     },
-    meta: {
-        fontSize: FontSize.xs,
-        color: 'rgba(255,255,255,0.6)',
-        marginTop: 2,
-    },
-    dismissButton: {
-        marginLeft: Spacing[3],
-        paddingTop: 2,
-    },
-    dismissIcon: {
-        fontSize: FontSize.sm,
-        color: 'rgba(255,255,255,0.7)',
-        fontWeight: FontWeight.bold,
+    dismiss: {
+        padding: 4,
     },
     accentBar: {
         height: 3,
-        backgroundColor: '#fca5a5',   // light red accent at bottom
+        backgroundColor: '#ef4444', // vibrant red accent
+        width: '100%',
     },
     list: {
-        gap: 2,
+        // base list container
     },
     listItem: {
-        marginTop: 2,
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(255,255,255,0.05)',
     },
     notice: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: Colors.errorLight,
-        borderRadius: 8,
+        backgroundColor: '#fef2f2',
+        borderRadius: BorderRadius.lg,
         paddingHorizontal: Spacing[3],
-        paddingVertical: Spacing[2],
+        paddingVertical: Spacing[2.5],
         borderWidth: 1,
-        borderColor: Colors.errorBorder,
+        borderColor: '#fee2e2',
         gap: Spacing[2],
+        shadowColor: Colors.error,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 2,
     },
-    noticeIcon: {
-        fontSize: FontSize.base,
+    noticeIconWrapper: {
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        backgroundColor: '#fee2e2',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     noticeText: {
         flex: 1,
@@ -273,8 +288,4 @@ const styles = StyleSheet.create({
         fontWeight: FontWeight.semiBold,
         color: Colors.error,
     },
-    noticeArrow: {
-        fontSize: FontSize.lg,
-        color: Colors.error,
-    },
-});
+});

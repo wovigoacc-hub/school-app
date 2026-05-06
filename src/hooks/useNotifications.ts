@@ -8,15 +8,12 @@ import { selectIsAuthenticated, selectUserId, selectUserType } from '../store/sl
 import { showToast } from '../store/slices/uiSlice';
 import {
     setCachedPushToken,
-    getCachedPushToken,
 } from '../utils/storage.utils';
 import type { NotificationData } from '../types/notification.types';
 import { NOTIFICATION_SCREEN_MAP } from '../types/notification.types';
 import { useRegisterDeviceTokenMutation } from '../services/root/auth.service';
 
 // ─── Navigation ref type (passed in from RootNavigator) ──────────────────────
-// We accept a ref rather than importing navigation directly to avoid
-// the hook depending on navigation context (can be called before nav mounts)
 
 type NavigationRef = {
     navigate: (screen: string, params?: Record<string, unknown>) => void;
@@ -29,46 +26,72 @@ export function useNotifications(navigationRef?: React.RefObject<NavigationRef>)
     const userId = useAppSelector(selectUserId);
     const userType = useAppSelector(selectUserType);
     const [registerToken] = useRegisterDeviceTokenMutation();
-    const tokenRegisteredRef = useRef(false);
+    
+    // Use a ref to prevent infinite loops, but we'll be more aggressive now
+    const lastRegisteredTokenRef = useRef<string | null>(null);
+    const isRegisteringRef = useRef(false);
 
     // ─── Request permission ──────────────────────────────────────────────────
 
     const requestPermission = useCallback(async (): Promise<boolean> => {
-        const authStatus = await messaging().requestPermission();
-        return (
-            authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-            authStatus === messaging.AuthorizationStatus.PROVISIONAL
-        );
+        try {
+            const authStatus = await messaging().requestPermission();
+            return (
+                authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+                authStatus === messaging.AuthorizationStatus.PROVISIONAL
+            );
+        } catch (e) {
+            console.error('[Notifications] Permission error:', e);
+            return false;
+        }
     }, []);
 
     // ─── Register FCM token with server ──────────────────────────────────────
 
-    const registerFcmToken = useCallback(async () => {
-        if (!isAuthenticated || tokenRegisteredRef.current) return;
+    const registerFcmToken = useCallback(async (force = false) => {
+        // Skip if not logged in or already registering
+        if (!isAuthenticated || !userType || isRegisteringRef.current) {
+            return;
+        }
 
         try {
+            isRegisteringRef.current = true;
+            console.log('[Notifications] Starting token registration check...');
+
             const granted = await requestPermission();
-            if (!granted) return;
+            if (!granted) {
+                console.warn('[Notifications] Permission not granted');
+                isRegisteringRef.current = false;
+                return;
+            }
 
             const token = await messaging().getToken();
-            if (!token) return;
+            if (!token) {
+                console.warn('[Notifications] Could not get FCM token');
+                isRegisteringRef.current = false;
+                return;
+            }
 
-            const cached = getCachedPushToken();
-
-            // Only register if token is new or changed
-            if (token !== cached) {
-                if (!userType) return; // no userType yet — skip registration
+            // FORCE registration if requested, OR if token has changed since last registration in this session
+            if (force || token !== lastRegisteredTokenRef.current) {
+                console.log(`[Notifications] Syncing token to server for ${userType}...`);
+                
                 await registerToken({
                     token,
                     platform: Platform.OS as 'ios' | 'android',
                     userType,
                 }).unwrap();
-                setCachedPushToken(token);
-            }
 
-            tokenRegisteredRef.current = true;
-        } catch {
-            // Non-fatal — push notifications degrade gracefully
+                console.log('[Notifications] Token synced successfully');
+                lastRegisteredTokenRef.current = token;
+                setCachedPushToken(token);
+            } else {
+                console.log('[Notifications] Token already synced for this session');
+            }
+        } catch (error) {
+            console.error('[Notifications] Sync failed:', error);
+        } finally {
+            isRegisteringRef.current = false;
         }
     }, [isAuthenticated, userType, registerToken, requestPermission]);
 
@@ -96,7 +119,7 @@ export function useNotifications(navigationRef?: React.RefObject<NavigationRef>)
 
     const handleForegroundMessage = useCallback(
         (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
-            const title = remoteMessage.notification?.title ?? '';
+            const title = remoteMessage.notification?.title ?? 'New Notification';
             const body = remoteMessage.notification?.body ?? '';
 
             dispatch(
@@ -112,58 +135,46 @@ export function useNotifications(navigationRef?: React.RefObject<NavigationRef>)
 
     // ─── Effects ─────────────────────────────────────────────────────────────
 
+    // 1. Handle Authentication Changes
     useEffect(() => {
-        if (!isAuthenticated) return;
+        if (isAuthenticated && userType) {
+            console.log('[Notifications] User authenticated, triggering sync');
+            registerFcmToken(true); // Force sync on login
+        } else {
+            lastRegisteredTokenRef.current = null; // Clear on logout
+        }
+    }, [isAuthenticated, userType, registerFcmToken]);
 
-        // Register token when authenticated
-        registerFcmToken();
-
-        // Refresh token when app comes to foreground (token may have rotated)
-        const appStateSub = AppState.addEventListener(
-            'change',
-            (state: AppStateStatus) => {
-                if (state === 'active') {
-                    tokenRegisteredRef.current = false; // allow re-check
-                    registerFcmToken();
-                }
-            },
-        );
-
-        return () => {
-            appStateSub.remove();
-        };
+    // 2. Handle App State (Foreground/Background)
+    useEffect(() => {
+        const sub = AppState.addEventListener('change', (state: AppStateStatus) => {
+            if (state === 'active' && isAuthenticated) {
+                console.log('[Notifications] App resumed, refreshing token');
+                registerFcmToken(true); // Force sync on resume
+            }
+        });
+        return () => sub.remove();
     }, [isAuthenticated, registerFcmToken]);
 
+    // 3. Handle Messaging Events
     useEffect(() => {
-        // Foreground message handler
         const unsubForeground = messaging().onMessage(handleForegroundMessage);
 
-        // Background / quit tap handler — app opened from notification
-        const unsubBackground = messaging().onNotificationOpenedApp(
-            (remoteMessage) => {
+        const unsubBackground = messaging().onNotificationOpenedApp((remoteMessage) => {
+            const data = remoteMessage.data as NotificationData | undefined;
+            if (data) navigateFromNotification(data);
+        });
+
+        messaging().getInitialNotification().then((remoteMessage) => {
+            if (remoteMessage) {
                 const data = remoteMessage.data as NotificationData | undefined;
-                if (data) navigateFromNotification(data);
-            },
-        );
+                if (data) setTimeout(() => navigateFromNotification(data), 500);
+            }
+        });
 
-        // Check if app was launched from a quit-state notification
-        messaging()
-            .getInitialNotification()
-            .then((remoteMessage) => {
-                if (remoteMessage) {
-                    const data = remoteMessage.data as NotificationData | undefined;
-                    if (data) {
-                        // Small delay — navigator needs to be ready
-                        setTimeout(() => navigateFromNotification(data), 500);
-                    }
-                }
-            });
-
-        // Token refresh handler (FCM may rotate the token)
         const unsubRefresh = messaging().onTokenRefresh((newToken) => {
-            setCachedPushToken(newToken);
-            tokenRegisteredRef.current = false;
-            registerFcmToken();
+            console.log('[Notifications] Token refreshed by Firebase');
+            registerFcmToken(true);
         });
 
         return () => {

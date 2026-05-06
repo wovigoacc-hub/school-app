@@ -20,6 +20,7 @@ import { ExamListScreen } from '../screens/teacher/marks/ExamListScreen';
 import { MarkSheetScreen } from '../screens/teacher/marks/MarkSheetScreen';
 import { MarkEntryScreen } from '../screens/teacher/marks/MarkEntryScreen';
 import { AnnouncementFeedScreen } from '../screens/teacher/announcements/AnnouncementFeedScreen';
+import { AnnouncementDetailScreen } from '../screens/common/announcements/AnnouncementDetailScreen';
 import { AnnouncementCreateScreen } from '../screens/teacher/announcements/AnnouncementCreateScreen';
 import { RequestListScreen } from '../screens/teacher/requests/RequestListScreen';
 import { RequestDetailScreen } from '../screens/teacher/requests/RequestDetailScreen';
@@ -264,14 +265,14 @@ export function TeacherNavigator() {
 
             {/* Announcements */}
             <Stack.Screen
-                name="AnnouncementFeed"
+                name="Announcements"
                 component={AnnouncementFeedScreen}
                 options={{ title: 'Announcements' }}
             />
             <Stack.Screen
                 name="AnnouncementDetail"
-                component={AnnouncementFeedScreen}   // detail handled inline
-                options={{ title: 'Announcement' }}
+                component={AnnouncementDetailScreen}
+                options={{ headerShown: false }}
             />
             <Stack.Screen
                 name="AnnouncementCreate"

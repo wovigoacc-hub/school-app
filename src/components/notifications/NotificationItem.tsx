@@ -17,20 +17,28 @@ import { NOTIFICATION_SCREEN_MAP } from '../../types/notification.types';
 
 // ─── Icon map per notification category ──────────────────────────────────────
 
-const NOTIFICATION_ICONS: Record<string, { icon: string; bg: string }> = {
-    absence_alert: { icon: 'alert-circle', bg: '#fee2e2' },
-    homework_reminder: { icon: 'book', bg: '#dbeafe' },
-    results_published: { icon: 'stats-chart', bg: '#dcfce7' },
-    attendance_threshold: { icon: 'warning', bg: '#fef3c7' },
-    request_update: { icon: 'mail-unread', bg: '#f3e8ff' },
-    announcement: { icon: 'megaphone', bg: '#e0f2fe' },
-    mark_deadline: { icon: 'create', bg: '#fef3c7' },
-    payment_failed: { icon: 'card', bg: '#fee2e2' },
-    default: { icon: 'notifications', bg: Colors.primarySubtle },
+const NOTIFICATION_ICONS: Record<string, { icon: string; bg: string; color?: string }> = {
+    absence_alert: { icon: 'alert-circle', bg: '#fee2e2', color: Colors.error },
+    homework_reminder: { icon: 'book', bg: '#dbeafe', color: Colors.primary },
+    results_published: { icon: 'stats-chart', bg: '#dcfce7', color: Colors.success },
+    attendance_threshold: { icon: 'warning', bg: '#fef3c7', color: '#b45309' },
+    request_update: { icon: 'mail-unread', bg: '#f3e8ff', color: '#7e22ce' },
+    announcement: { icon: 'megaphone', bg: '#e0f2fe', color: '#0369a1' },
+    mark_deadline: { icon: 'create', bg: '#fef3c7', color: '#b45309' },
+    emergency: { icon: 'notifications', bg: '#fef2f2', color: Colors.error },
+    default: { icon: 'notifications', bg: Colors.primarySubtle, color: Colors.primary },
 };
 
 function getIconConfig(notification: NotificationRecord) {
-    const screen = (notification.data as NotificationData | undefined)?.screen ?? '';
+    const data = notification.data as NotificationData | undefined;
+    const screen = data?.screen ?? '';
+
+    // Priority 1: Check for Emergency status
+    if (notification.title.includes('🚨') || notification.body.includes('Emergency') || screen === 'Announcements') {
+        // If it's an announcement that's an emergency, use the red icon
+        return NOTIFICATION_ICONS.emergency;
+    }
+
     if (screen.includes('Attendance')) return NOTIFICATION_ICONS.absence_alert;
     if (screen.includes('Homework')) return NOTIFICATION_ICONS.homework_reminder;
     if (screen.includes('Results')) return NOTIFICATION_ICONS.results_published;
@@ -84,7 +92,7 @@ export function NotificationItem({
                 <Icon
                     name={iconConfig.icon}
                     size={22}
-                    color={Colors.grey700}
+                    color={iconConfig.color ?? Colors.grey700}
                 />
             </View>
 

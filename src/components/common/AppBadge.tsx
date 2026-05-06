@@ -1,4 +1,5 @@
 import React from 'react';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { View, StyleSheet, type ViewStyle } from 'react-native';
 import { AppText } from './AppText';
 import { Colors, ANNOUNCEMENT_COLORS, REQUEST_STATUS_COLORS, PRIORITY_COLORS } from '../../constants/colors';
@@ -72,12 +73,21 @@ interface StatusBadgeProps {
     label: string;
     textColor: string;
     bgColor: string;
+    icon?: string;
     style?: ViewStyle;
 }
 
-export function StatusBadge({ label, textColor, bgColor, style }: StatusBadgeProps) {
+export function StatusBadge({ label, textColor, bgColor, icon, style }: StatusBadgeProps) {
     return (
-        <View style={[styles.statusBadge, { backgroundColor: bgColor }, style]}>
+        <View style={[styles.statusBadge, { backgroundColor: bgColor }, styles.row, style]}>
+            {icon && (
+                <Ionicons
+                    name={icon}
+                    size={12}
+                    color={textColor}
+                    style={styles.badgeIcon}
+                />
+            )}
             <AppText
                 style={[styles.statusText, { color: textColor }]}
                 numberOfLines={1}
@@ -104,13 +114,14 @@ export function AnnouncementTypeBadge({ type, style }: AnnouncementBadgeProps) {
         EVENT: 'Event',
         EXAM_SCHEDULE: 'Exam',
         PARENT_MEETING: 'Meeting',
-        EMERGENCY: '🚨 Emergency',
+        EMERGENCY: 'Emergency',
     };
     return (
         <StatusBadge
             label={labels[type]}
             textColor={config.text}
             bgColor={config.bg}
+            icon={type === 'EMERGENCY' ? 'notifications' : undefined}
             style={style}
         />
     );
@@ -171,9 +182,10 @@ export function PriorityBadge({ priority, style }: PriorityBadgeProps) {
 export function EmergencyBadge({ style }: { style?: ViewStyle }) {
     return (
         <StatusBadge
-            label="🚨 Emergency"
+            label="Emergency"
             textColor={Colors.badgeEmergency}
             bgColor={Colors.badgeEmergencyBg}
+            icon="notifications"
             style={style}
         />
     );
@@ -213,6 +225,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: Spacing[2],
         paddingVertical: 3,
         alignSelf: 'flex-start',
+    },
+    row: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    badgeIcon: {
+        marginRight: 4,
     },
     statusText: {
         fontSize: FontSize.xs,
