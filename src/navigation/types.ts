@@ -79,6 +79,7 @@ export type TeacherNavigatorParamList = {
     // ── Profile ───────────────────────────────────────────────────────────────
     TeacherProfile: undefined;
     ChangePassword: undefined;
+    UpdatePassword: undefined;
 };
 
 // ─── Parent bottom tabs ───────────────────────────────────────────────────────
@@ -128,6 +129,7 @@ export type ParentNavigatorParamList = {
     // ── Profile ───────────────────────────────────────────────────────────────
     ParentProfile: undefined;
     ChangePassword: undefined;
+    UpdatePassword: undefined;
 };
 
 // ─── Root navigator ───────────────────────────────────────────────────────────

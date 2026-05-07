@@ -23,9 +23,10 @@ const NOTIFICATION_ICONS: Record<string, { icon: string; bg: string; color?: str
     results_published: { icon: 'stats-chart', bg: '#dcfce7', color: Colors.success },
     attendance_threshold: { icon: 'warning', bg: '#fef3c7', color: '#b45309' },
     request_update: { icon: 'mail-unread', bg: '#f3e8ff', color: '#7e22ce' },
-    announcement: { icon: 'megaphone', bg: '#e0f2fe', color: '#0369a1' },
+    announcement: { icon: 'megaphone', bg: '#dcfce7', color: Colors.success },
     mark_deadline: { icon: 'create', bg: '#fef3c7', color: '#b45309' },
     emergency: { icon: 'notifications', bg: '#fef2f2', color: Colors.error },
+    urgent: { icon: 'alert-circle', bg: '#fff7ed', color: '#ea580c' },
     default: { icon: 'notifications', bg: Colors.primarySubtle, color: Colors.primary },
 };
 
@@ -33,9 +34,11 @@ function getIconConfig(notification: NotificationRecord) {
     const data = notification.data as NotificationData | undefined;
     const screen = data?.screen ?? '';
 
-    // Priority 1: Check for Emergency status
-    if (notification.title.includes('🚨') || notification.body.includes('Emergency') || screen === 'Announcements') {
-        // If it's an announcement that's an emergency, use the red icon
+    // Priority 1: Check for Urgent/Emergency status
+    if (notification.title.includes('🚨')) {
+        return NOTIFICATION_ICONS.urgent;
+    }
+    if (notification.body.includes('Emergency')) {
         return NOTIFICATION_ICONS.emergency;
     }
 

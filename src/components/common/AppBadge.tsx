@@ -204,19 +204,28 @@ const styles = StyleSheet.create({
     countBadgeMd: {
         height: 20,
         minWidth: 20,
-        paddingHorizontal: Spacing[1],
+        paddingHorizontal: 2,
     },
     countBadgeSm: {
         height: 16,
         minWidth: 16,
-        paddingHorizontal: 3,
+        paddingHorizontal: 2,
     },
     countText: {
         color: Colors.textInverse,
         fontWeight: FontWeight.bold,
+        textAlign: 'center',
+        textAlignVertical: 'center',
+        includeFontPadding: false,
     },
-    countTextMd: { fontSize: FontSize.xs },
-    countTextSm: { fontSize: 9 },
+    countTextMd: { 
+        fontSize: 10,
+        lineHeight: 20,
+    },
+    countTextSm: { 
+        fontSize: 8,
+        lineHeight: 16,
+    },
     dot: {
         // width/height/borderRadius set via props
     },

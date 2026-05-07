@@ -38,11 +38,18 @@ export const authApi = api.injectEndpoints({
         }),
 
         // ─── Force change password (first login) ─────────────────────────────────
-        // Route: /auth/mobile/{teacher|parent}/force-change-password
-        // userType is stripped from the body before sending — used only to pick URL
-        changePassword: builder.mutation<ApiResponse<null>, ChangePasswordRequest & { userType: UserType }>({
+        forceChangePassword: builder.mutation<ApiResponse<null>, ChangePasswordRequest & { userType: UserType }>({
             query: ({ userType, ...body }) => ({
                 url: `/auth/mobile/${rolePath(userType)}/force-change-password`,
+                method: 'PATCH',
+                body,
+            }),
+        }),
+
+        // ─── Update password (voluntary) ─────────────────────────────────────────
+        updatePassword: builder.mutation<ApiResponse<null>, ChangePasswordRequest & { userType: UserType }>({
+            query: ({ userType, ...body }) => ({
+                url: `/auth/mobile/${rolePath(userType)}/change-password`,
                 method: 'PATCH',
                 body,
             }),
@@ -92,7 +99,8 @@ export const authApi = api.injectEndpoints({
 export const {
     useTeacherLoginMutation,
     useParentLoginMutation,
-    useChangePasswordMutation,
+    useForceChangePasswordMutation,
+    useUpdatePasswordMutation,
     useRefreshTokenMutation,
     useLogoutMutation,
     useRegisterDeviceTokenMutation,

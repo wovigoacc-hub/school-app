@@ -5,36 +5,33 @@ import {
     ScrollView,
     KeyboardAvoidingView,
     Platform,
+    Alert,
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppText } from '../../components/common/AppText';
-import { AppInput } from '../../components/common/AppInput';
-import { AppButton } from '../../components/common/AppButton';
-import { AppStatusBar } from '../../components/common/AppStatusBar';
-import { SectionHeader } from '../../components/layout/SectionHeader';
-import { Divider, Spacer } from '../../components/layout/Divider';
-import { useAppDispatch, useAppSelector } from '../../app/store';
-import {
-    clearFirstLogin,
-    selectDisplayName,
-    selectUserType,
-} from '../../store/slices/authSlice';
-import { useForceChangePasswordMutation } from '../../services/root/auth.service';
+import { AppText } from '../../../components/common/AppText';
+import { AppInput } from '../../../components/common/AppInput';
+import { AppButton } from '../../../components/common/AppButton';
+import { AppStatusBar } from '../../../components/common/AppStatusBar';
+import { Spacer } from '../../../components/layout/Divider';
+import { useAppSelector } from '../../../app/store';
+import { selectUserType } from '../../../store/slices/authSlice';
+import { useUpdatePasswordMutation } from '../../../services/root/auth.service';
 import {
     required,
     minPasswordLength,
     strongPassword,
     passwordsMatch,
     composeValidators,
-} from '../../utils/validation.utils';
-import { Colors } from '../../constants/colors';
-import { Spacing, Layout, BorderRadius } from '../../constants/spacing';
-import { FontSize } from '../../constants/typography';
+} from '../../../utils/validation.utils';
+import { Colors } from '../../../constants/colors';
+import { Spacing, Layout, BorderRadius } from '../../../constants/spacing';
+import { FontSize } from '../../../constants/typography';
+import { useNavigation } from '@react-navigation/native';
 
 // ─── Form shape ───────────────────────────────────────────────────────────────
 
-interface ChangePasswordFormValues {
+interface UpdatePasswordFormValues {
     currentPassword: string;
     newPassword: string;
     confirmPassword: string;
@@ -42,11 +39,7 @@ interface ChangePasswordFormValues {
 
 // ─── Password strength indicator ─────────────────────────────────────────────
 
-interface StrengthIndicatorProps {
-    password: string;
-}
-
-function PasswordStrengthIndicator({ password }: StrengthIndicatorProps) {
+function PasswordStrengthIndicator({ password }: { password: string }) {
     const checks = [
         { label: 'At least 8 characters', pass: password.length >= 8 },
         { label: 'Uppercase letter', pass: /[A-Z]/.test(password) },
@@ -62,7 +55,6 @@ function PasswordStrengthIndicator({ password }: StrengthIndicatorProps) {
 
     return (
         <View style={strengthStyles.container}>
-            {/* Progress bars */}
             <View style={strengthStyles.bars}>
                 {[1, 2, 3, 4].map((i) => (
                     <View
@@ -74,82 +66,36 @@ function PasswordStrengthIndicator({ password }: StrengthIndicatorProps) {
                     />
                 ))}
             </View>
-
-            <AppText
-                style={[strengthStyles.label, { color: colours[score] }]}
-            >
+            <AppText style={[strengthStyles.label, { color: colours[score] }]}>
                 {labels[score]}
             </AppText>
-
-            {/* Check list */}
-            <View style={strengthStyles.checks}>
-                {checks.map(({ label, pass }) => (
-                    <View key={label} style={strengthStyles.checkRow}>
-                        <AppText style={[strengthStyles.checkIcon, { color: pass ? Colors.success : Colors.border }]}>
-                            {pass ? '✓' : '○'}
-                        </AppText>
-                        <AppText style={[strengthStyles.checkText, { color: pass ? Colors.textSecondary : Colors.textTertiary }]}>
-                            {label}
-                        </AppText>
-                    </View>
-                ))}
-            </View>
         </View>
     );
 }
 
 const strengthStyles = StyleSheet.create({
-    container: {
-        gap: Spacing[2],
-    },
-    bars: {
-        flexDirection: 'row',
-        gap: 4,
-    },
-    bar: {
-        flex: 1,
-        height: 4,
-        borderRadius: 2,
-        backgroundColor: Colors.border,
-    },
-    label: {
-        fontSize: FontSize.xs,
-        alignSelf: 'flex-end',
-        marginTop: -Spacing[1],
-    },
-    checks: {
-        gap: Spacing[1],
-    },
-    checkRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: Spacing[2],
-    },
-    checkIcon: {
-        fontSize: FontSize.sm,
-        width: 14,
-    },
-    checkText: {
-        fontSize: FontSize.xs,
-    },
+    container: { gap: Spacing[2], marginTop: Spacing[1] },
+    bars: { flexDirection: 'row', gap: 4 },
+    bar: { flex: 1, height: 4, borderRadius: 2, backgroundColor: Colors.border },
+    label: { fontSize: FontSize.xs, alignSelf: 'flex-end', marginTop: -Spacing[1] },
 });
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
-export function ChangePasswordScreen() {
-    const dispatch = useAppDispatch();
-    const displayName = useAppSelector(selectDisplayName);
+export function UpdatePasswordScreen() {
+    const navigation = useNavigation();
     const userType = useAppSelector(selectUserType);
     const [apiError, setApiError] = useState('');
 
-    const [forceChangePassword, { isLoading }] = useForceChangePasswordMutation();
+    const [updatePassword, { isLoading }] = useUpdatePasswordMutation();
 
     const {
         control,
         handleSubmit,
         watch,
+        reset,
         formState: { errors },
-    } = useForm<ChangePasswordFormValues>({
+    } = useForm<UpdatePasswordFormValues>({
         defaultValues: {
             currentPassword: '',
             newPassword: '',
@@ -161,23 +107,27 @@ export function ChangePasswordScreen() {
     const watchedNewPassword = watch('newPassword');
 
     const onSubmit = useCallback(
-        async (values: ChangePasswordFormValues) => {
+        async (values: UpdatePasswordFormValues) => {
             setApiError('');
             try {
-                await forceChangePassword({
+                await updatePassword({
                     userType: userType!,
                     currentPassword: values.currentPassword,
                     newPassword: values.newPassword,
                 }).unwrap();
 
-                // Dispatch — RootNavigator watches isFirstLogin and will navigate away
-                dispatch(clearFirstLogin());
+                Alert.alert(
+                    'Success',
+                    'Your password has been changed successfully.',
+                    [{ text: 'OK', onPress: () => navigation.goBack() }]
+                );
+                reset();
             } catch (err: any) {
                 const status = err?.status ?? err?.data?.statusCode;
                 const message = err?.data?.message ?? err?.message;
 
                 if (status === 401) {
-                    setApiError('Your current password is incorrect. Please try again.');
+                    setApiError('Current password is incorrect. Please try again.');
                 } else if (typeof message === 'string') {
                     setApiError(message);
                 } else {
@@ -185,14 +135,13 @@ export function ChangePasswordScreen() {
                 }
             }
         },
-        [forceChangePassword, dispatch, userType],
+        [updatePassword, userType, navigation, reset],
     );
-
-    const roleLabel = userType === 'teacher' ? 'Teacher' : 'Parent';
 
     return (
         <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
             <AppStatusBar variant="default" />
+            
             <KeyboardAvoidingView
                 style={styles.flex}
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -202,31 +151,15 @@ export function ChangePasswordScreen() {
                     keyboardShouldPersistTaps="handled"
                     showsVerticalScrollIndicator={false}
                 >
-                    {/* Header */}
-                    <View style={styles.header}>
-                        <View style={styles.iconBox}>
-                            <AppText style={styles.iconEmoji}>🔐</AppText>
-                        </View>
-                        <AppText variant="h3" center style={styles.title}>
-                            Set Your Password
-                        </AppText>
-                        <AppText variant="body1" secondary center style={styles.subtitle}>
-                            Welcome, {displayName || roleLabel}!{'\n'}
-                            Please create a new password to continue.
+                    <View style={styles.intro}>
+                        <AppText variant="body1" secondary>
+                            Choose a strong password that you don't use elsewhere.
+                            Passwords must be at least 8 characters long.
                         </AppText>
                     </View>
 
-                    {/* Cannot skip notice */}
-                    <View style={styles.noticeBanner}>
-                        <AppText style={styles.noticeText}>
-                            🔒 For your security, you must set a personal password before using the app.
-                        </AppText>
-                    </View>
-
-                    {/* Form card */}
                     <View style={styles.card}>
-
-                        {/* Current (temporary) password */}
+                        {/* Current password */}
                         <Controller
                             control={control}
                             name="currentPassword"
@@ -234,8 +167,7 @@ export function ChangePasswordScreen() {
                             render={({ field: { onChange, onBlur, value, ref } }) => (
                                 <AppInput
                                     ref={ref}
-                                    label="Temporary password"
-                                    hint="The password sent to you by your school"
+                                    label="Current Password"
                                     value={value}
                                     onChangeText={onChange}
                                     onBlur={onBlur}
@@ -249,8 +181,6 @@ export function ChangePasswordScreen() {
                             )}
                         />
 
-                        <Divider style={styles.divider} />
-
                         {/* New password */}
                         <Controller
                             control={control}
@@ -259,10 +189,10 @@ export function ChangePasswordScreen() {
                                 validate: composeValidators(required, minPasswordLength, strongPassword),
                             }}
                             render={({ field: { onChange, onBlur, value, ref } }) => (
-                                <>
+                                <View>
                                     <AppInput
                                         ref={ref}
-                                        label="New password"
+                                        label="New Password"
                                         value={value}
                                         onChangeText={onChange}
                                         onBlur={onBlur}
@@ -274,7 +204,7 @@ export function ChangePasswordScreen() {
                                         required
                                     />
                                     <PasswordStrengthIndicator password={value} />
-                                </>
+                                </View>
                             )}
                         />
 
@@ -291,7 +221,7 @@ export function ChangePasswordScreen() {
                             render={({ field: { onChange, onBlur, value, ref } }) => (
                                 <AppInput
                                     ref={ref}
-                                    label="Confirm new password"
+                                    label="Confirm New Password"
                                     value={value}
                                     onChangeText={onChange}
                                     onBlur={onBlur}
@@ -315,86 +245,42 @@ export function ChangePasswordScreen() {
                             </View>
                         )}
 
-                        {/* Submit */}
+                        <Spacer size={Spacing[4]} />
+
                         <AppButton
-                            label={isLoading ? 'Saving…' : 'Set Password & Continue'}
+                            label={isLoading ? 'Updating…' : 'Update Password'}
                             onPress={handleSubmit(onSubmit)}
                             loading={isLoading}
                             fullWidth
-                            style={styles.submitBtn}
                         />
                     </View>
-
-                    <Spacer size={Spacing[8]} />
                 </ScrollView>
             </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
-
 const styles = StyleSheet.create({
-    safe: {
-        flex: 1,
-        backgroundColor: Colors.background,
-    },
+    safe: { flex: 1, backgroundColor: Colors.background },
     flex: { flex: 1 },
     scroll: {
-        flexGrow: 1,
         padding: Layout.screenPaddingH,
-        paddingTop: Spacing[6],
+        paddingBottom: Spacing[10],
     },
-    header: {
-        alignItems: 'center',
-        marginBottom: Spacing[5],
-    },
-    iconBox: {
-        width: 72,
-        height: 72,
-        borderRadius: BorderRadius['2xl'],
-        backgroundColor: Colors.warningLight,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: Spacing[4],
-    },
-    iconEmoji: {
-        fontSize: 36,
-    },
-    title: {
-        marginBottom: Spacing[2],
-    },
-    subtitle: {
-        lineHeight: 22,
-        maxWidth: 280,
-        textAlign: 'center',
-    },
-    noticeBanner: {
-        backgroundColor: Colors.warningLight,
-        borderRadius: BorderRadius.lg,
-        padding: Spacing[3],
-        borderWidth: 1,
-        borderColor: Colors.warningBorder,
-        marginBottom: Spacing[5],
-    },
-    noticeText: {
-        fontSize: FontSize.sm,
-        color: Colors.warning,
-        lineHeight: 18,
+    intro: {
+        marginBottom: Spacing[6],
+        marginTop: Spacing[2],
     },
     card: {
         backgroundColor: Colors.surface,
-        borderRadius: BorderRadius['2xl'],
-        padding: Spacing[6],
+        borderRadius: BorderRadius.xl,
+        padding: Spacing[5],
         gap: Spacing[4],
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.06,
-        shadowRadius: 8,
-        elevation: 3,
-    },
-    divider: {
-        marginVertical: Spacing[1],
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 2,
     },
     apiError: {
         backgroundColor: Colors.errorLight,
@@ -402,8 +288,5 @@ const styles = StyleSheet.create({
         padding: Spacing[3],
         borderWidth: 1,
         borderColor: Colors.errorBorder,
-    },
-    submitBtn: {
-        marginTop: Spacing[2],
     },
 });

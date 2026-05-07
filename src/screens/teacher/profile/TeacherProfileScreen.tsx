@@ -385,7 +385,7 @@ export function TeacherProfileScreen() {
                             iconBg="#eff6ff"
                             label="Change Password"
                             value="Update your account password"
-                            onPress={() => navigation.navigate('ChangePassword')}
+                            onPress={() => navigation.navigate('UpdatePassword')}
                         />
                         <ProfileRow
                             icon="phone-portrait"
