@@ -94,9 +94,9 @@ export const PARENT_ENDPOINTS = {
 
     // Attendance
     CHILD_TODAY: (studentId: string) =>
-        `/mobile/parent/students/${studentId}/attendance/today`,
+        `/mobile/parent/attendance/${studentId}/today`,
     CHILD_ATTENDANCE: (studentId: string) =>
-        `/mobile/parent/students/${studentId}/attendance`,
+        `/mobile/parent/attendance/${studentId}`,
 
     // Homework
     CHILD_HOMEWORK: (studentId: string) =>

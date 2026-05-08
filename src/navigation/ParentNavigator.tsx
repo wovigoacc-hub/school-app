@@ -20,6 +20,8 @@ import { RequestListScreen } from '../screens/parent/requests/RequestListScreen'
 import { RequestCreateScreen } from '../screens/parent/requests/RequestCreateScreen';
 import { RequestDetailScreen } from '../screens/parent/requests/RequestDetailScreen';
 import { ParentProfileScreen } from '../screens/parent/profile/ParentProfileScreen';
+import { UpdatePasswordScreen } from '../screens/teacher/profile/UpdatePasswordScreen';
+
 
 // ── Queries ──────────────────────────────────────────────────────────────────
 import { useGetParentUnreadAnnouncementCountQuery }
@@ -38,7 +40,6 @@ import type {
     ParentNavigatorParamList,
     ParentTabParamList,
 } from './types';
-import { ChangePasswordScreen } from '../screens/auth/ChangePasswordScreen';
 
 // ─── Navigators ───────────────────────────────────────────────────────────────
 
@@ -285,9 +286,9 @@ export function ParentNavigator() {
                 options={{ title: 'Profile' }}
             />
             <Stack.Screen
-                name="ChangePassword"
-                component={ChangePasswordScreen}
-                options={{ title: 'Change Password' }}
+                name="UpdatePassword"
+                component={UpdatePasswordScreen}
+                options={{ title: 'Update Password' }}
             />
         </Stack.Navigator>
     );

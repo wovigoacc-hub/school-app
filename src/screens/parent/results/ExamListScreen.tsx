@@ -186,15 +186,14 @@ function ResultCard({ result, studentId, onPress }: ResultCardProps) {
 export function ExamListScreen() {
     const route = useRoute<RouteProps>();
     const navigation = useNavigation<Nav>();
-    const { studentId } = route.params;
-
-    const { activeChild } = useActiveChild();
+    const { activeChild, activeChildId } = useActiveChild();
+    const studentId = route.params?.studentId || activeChildId;
 
     const {
         data,
         isLoading,
         refetch,
-    } = useGetChildResultsQuery(studentId);
+    } = useGetChildResultsQuery(studentId ?? '');
 
     const results = data?.data ?? [];
     const { refreshing, onRefresh } = useRefresh(refetch);
@@ -203,9 +202,9 @@ export function ExamListScreen() {
         ({ item }) => (
             <ResultCard
                 result={item}
-                studentId={studentId}
+                studentId={studentId ?? ''}
                 onPress={() =>
-                    navigation.navigate('ExamResult', {
+                    studentId && navigation.navigate('ExamResult', {
                         examId: item.examId,
                         studentId,
                         examName: item.examName,
@@ -242,7 +241,7 @@ export function ExamListScreen() {
                                 variant="secondary"
                                 size="sm"
                                 onPress={() =>
-                                    navigation.navigate('ProgressChart', { studentId })
+                                    studentId && navigation.navigate('ProgressChart', { studentId })
                                 }
                                 style={styles.chartBtn}
                             />

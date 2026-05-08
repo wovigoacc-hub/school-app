@@ -104,7 +104,7 @@ export function AnnouncementFeedScreen() {
     return (
         <ScreenWrapper noKeyboard noPadding statusBar="parent">
             <FlatList
-                data={isLoading ? [] : nonEmergency}
+                data={isLoading ? [] : announcements}
                 keyExtractor={(item) => item.id}
                 renderItem={renderItem}
                 ListHeaderComponent={

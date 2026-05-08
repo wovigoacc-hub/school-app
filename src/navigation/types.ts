@@ -90,6 +90,7 @@ export type ParentTabParamList = {
     HomeworkTab: { studentId?: string } | undefined;
     ResultsTab: { studentId: string };
     ProfileTab: undefined;
+    UpdatePassword: undefined;
 };
 
 // ─── Parent stack ─────────────────────────────────────────────────────────────

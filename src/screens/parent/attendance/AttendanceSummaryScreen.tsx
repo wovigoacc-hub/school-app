@@ -31,6 +31,7 @@ import {
 } from '../../../utils/attendance.utils';
 import { formatDate } from '../../../utils/date.utils';
 import { useGetChildAttendanceHistoryQuery } from '../../../services/parent/attendance.service';
+import { useActiveChild } from '../../../hooks/useActiveChild';
 import { Colors } from '../../../constants/colors';
 import { Layout, Spacing } from '../../../constants/spacing';
 import { FontSize } from '../../../constants/typography';
@@ -92,13 +93,14 @@ function RecordRow({ record }: RecordRowProps) {
 export function AttendanceSummaryScreen() {
     const route = useRoute<RouteProps>();
     const navigation = useNavigation<Nav>();
-    const { studentId } = route.params;
+    const { activeChildId } = useActiveChild();
+    const studentId = route.params?.studentId || activeChildId;
 
     const {
         data,
         isLoading,
         refetch,
-    } = useGetChildAttendanceHistoryQuery({ studentId }, { skip: !studentId });
+    } = useGetChildAttendanceHistoryQuery({ studentId: studentId ?? '' }, { skip: !studentId });
 
     const history = data?.data;
     const records = history?.records ?? [];
@@ -167,7 +169,7 @@ export function AttendanceSummaryScreen() {
                             variant="secondary"
                             leftIcon={<Icon name="calendar-outline" size={18} color={Colors.primary} />}
                             onPress={() =>
-                                navigation.navigate('AttendanceCalendar', { studentId })
+                                studentId && navigation.navigate('AttendanceCalendar', { studentId })
                             }
                             style={styles.calBtn}
                             fullWidth

@@ -22,6 +22,7 @@ import { useActiveChild } from '../../../hooks/useActiveChild';
 import { useAppDispatch } from '../../../app/store';
 import {
     useGetChildTodayAttendanceQuery,
+    useGetChildAttendanceHistoryQuery,
 } from '../../../services/parent/attendance.service';
 import {
     useGetChildHomeworkFeedQuery,
@@ -63,6 +64,14 @@ export function ParentHomeScreen() {
     });
 
     const {
+        data: historyData,
+        refetch: refetchHistory,
+        isLoading: historyLoading,
+    } = useGetChildAttendanceHistoryQuery({ studentId: activeChildId ?? '' }, {
+        skip: !activeChildId,
+    });
+
+    const {
         data: homeworkData,
         refetch: refetchHomework,
         isLoading: hwLoading,
@@ -80,6 +89,7 @@ export function ParentHomeScreen() {
     const [markRead] = useMarkParentAnnouncementsReadMutation();
 
     const todayAttendance = todayData?.data;
+    const history = historyData?.data;
     const pendingHomework = homeworkData?.data ?? [];
     const announcements = announcementData?.data ?? [];
     const emergencies = announcements.filter((a) => a.isEmergency && !a.isArchived);
@@ -89,10 +99,11 @@ export function ParentHomeScreen() {
     const refetchAll = useCallback(async () => {
         await Promise.all([
             refetchToday(),
+            refetchHistory(),
             refetchHomework(),
             refetchAnnouncements(),
         ]);
-    }, [refetchToday, refetchHomework, refetchAnnouncements]);
+    }, [refetchToday, refetchHistory, refetchHomework, refetchAnnouncements]);
 
     const { refreshing, onRefresh } = useRefresh(refetchAll);
 
@@ -118,7 +129,7 @@ export function ParentHomeScreen() {
         [navigation],
     );
 
-    const isLoading = todayLoading || hwLoading || announcementsLoading;
+    const isLoading = todayLoading || historyLoading || hwLoading || announcementsLoading;
 
     if (!activeChild) {
         return (
@@ -179,10 +190,16 @@ export function ParentHomeScreen() {
                         <ChildSummaryCard
                             child={activeChild}
                             todayAttendance={todayAttendance}
+                            summary={history ? {
+                                attendance: {
+                                    attendancePct: history.attendancePct,
+                                    totalDays: history.totalDays,
+                                }
+                            } as any : undefined}
                             pendingHomework={pendingHomework.length}
                             unreadAnnouncements={unreadCount}
                             onAttendancePress={() =>
-                                navigation.navigate('AttendanceCalendar', {
+                                navigation.navigate('AttendanceSummary', {
                                     studentId: activeChild.studentId,
                                 })
                             }

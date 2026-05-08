@@ -34,6 +34,7 @@ import { Colors } from '../../../constants/colors';
 import { BorderRadius, Layout, Spacing } from '../../../constants/spacing';
 import { FontSize, FontWeight } from '../../../constants/typography';
 import { useGetChildAttendanceHistoryQuery } from '../../../services/parent/attendance.service';
+import { useActiveChild } from '../../../hooks/useActiveChild';
 import { useAppSelector } from '../../../app/store';
 import { selectPreferredLang } from '../../../store/slices/authSlice';
 import type { AttendanceStatus, DailyAttendanceRecord } from '../../../types/attendance.types';
@@ -263,7 +264,8 @@ const navStyles = StyleSheet.create({
 
 export function AttendanceCalendarScreen() {
     const route = useRoute<RouteProps>();
-    const { studentId } = route.params;
+    const { activeChildId } = useActiveChild();
+    const studentId = route.params?.studentId || activeChildId;
     const lang = useAppSelector(selectPreferredLang);
 
     const now = new Date();
@@ -275,7 +277,7 @@ export function AttendanceCalendarScreen() {
         data,
         isLoading,
         refetch,
-    } = useGetChildAttendanceHistoryQuery({ studentId }, { skip: !studentId });
+    } = useGetChildAttendanceHistoryQuery({ studentId: studentId ?? '' }, { skip: !studentId });
 
     const history = data?.data;
     const allRecords = history?.records ?? [];
