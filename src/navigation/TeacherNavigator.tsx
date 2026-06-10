@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '../components/common/AppText';
 import { CountBadge } from '../components/common/AppBadge';
 import { AppStatusBar } from '../components/common/AppStatusBar';
@@ -105,16 +106,32 @@ const tabStyles = StyleSheet.create({
 // ─── Teacher tab navigator ────────────────────────────────────────────────────
 
 function TeacherTabs() {
+    const insets = useSafeAreaInsets();
     const { data: announcementCountData } =
         useGetTeacherUnreadAnnouncementCountQuery();
     const announcementBadge =
         announcementCountData?.data?.unreadCount ?? 0;
 
+    // Dynamically calculate style variations based on device safe areas
+    const dynamicTabBarStyle = {
+        backgroundColor: Colors.tabBarBg,
+        borderTopColor: Colors.tabBarBorder,
+        borderTopWidth: StyleSheet.hairlineWidth,
+        height: Layout.tabBarHeight + (insets.bottom > 0 ? insets.bottom - Spacing[2] : 0),
+        paddingBottom: insets.bottom > 0 ? insets.bottom : Spacing[2],
+        paddingTop: Spacing[2],
+        elevation: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: -2 },
+        shadowOpacity: 0.06,
+        shadowRadius: 4,
+    };
+
     return (
         <Tab.Navigator
             screenOptions={{
                 headerShown: false,
-                tabBarStyle: tabBarStyle,
+                tabBarStyle: dynamicTabBarStyle,
                 tabBarShowLabel: false,
             }}
         >
@@ -319,19 +336,3 @@ export function TeacherNavigator() {
         </Stack.Navigator>
     );
 }
-
-// ─── Shared tab bar style ─────────────────────────────────────────────────────
-
-const tabBarStyle = {
-    backgroundColor: Colors.tabBarBg,
-    borderTopColor: Colors.tabBarBorder,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    height: Layout.tabBarHeight,
-    paddingBottom: Spacing[2],
-    paddingTop: Spacing[2],
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-};

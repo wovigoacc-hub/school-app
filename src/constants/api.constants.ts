@@ -4,17 +4,17 @@ import { Platform } from 'react-native';
 // Dev: Android emulator uses 10.0.2.2 to reach localhost on host machine
 // Dev: iOS simulator uses localhost directly
 // Production: read from env / build config
-
-const DEV_BASE_URL = Platform.select({
-    android: 'http://10.27.202.93:8000',
-    ios: 'http://10.27.202.93:8000',
-    default: 'http://10.27.202.93:3000',
-});
+// www.schoolserver.wovigo.com
+// const DEV_BASE_URL = Platform.select({
+//     android: 'http://10.171.231.93:8000',
+//     ios: 'http://10.171.231.93:8000',
+//     default: 'http://10.171.231.93:3000',
+// });
 
 export const API_BASE_URL =
     __DEV__
-        ? DEV_BASE_URL
-        : 'https://api.schoolbridge.in/v1';   // swap to your production URL
+        ? 'https://www.schoolserver.wovigo.com'
+        : 'https://www.schoolserver.wovigo.com';   // swap to your production URL
 
 // ─── School identifier ────────────────────────────────────────────────────────
 // This app is built for a specific school — set to the school's slug in the database.

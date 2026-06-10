@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '../components/common/AppText';
 import { CountBadge } from '../components/common/AppBadge';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -21,7 +22,6 @@ import { RequestCreateScreen } from '../screens/parent/requests/RequestCreateScr
 import { RequestDetailScreen } from '../screens/parent/requests/RequestDetailScreen';
 import { ParentProfileScreen } from '../screens/parent/profile/ParentProfileScreen';
 import { UpdatePasswordScreen } from '../screens/teacher/profile/UpdatePasswordScreen';
-
 
 // ── Queries ──────────────────────────────────────────────────────────────────
 import { useGetParentUnreadAnnouncementCountQuery }
@@ -108,6 +108,7 @@ const ProgressChartPlaceholder = () => {
 // ─── Parent tab navigator ─────────────────────────────────────────────────────
 
 function ParentTabs() {
+    const insets = useSafeAreaInsets();
     const { data: announcementCountData } =
         useGetParentUnreadAnnouncementCountQuery();
     const { data: notificationCountData } =
@@ -119,11 +120,26 @@ function ParentTabs() {
 
     const { activeChild } = useActiveChild();
 
+    // Dynamically calculate style variations based on device safe areas
+    const dynamicTabBarStyle = {
+        backgroundColor: Colors.tabBarBg,
+        borderTopColor: Colors.tabBarBorder,
+        borderTopWidth: StyleSheet.hairlineWidth,
+        height: Layout.tabBarHeight + (insets.bottom > 0 ? insets.bottom - Spacing[2] : 0),
+        paddingBottom: insets.bottom > 0 ? insets.bottom : Spacing[2],
+        paddingTop: Spacing[2],
+        elevation: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: -2 },
+        shadowOpacity: 0.06,
+        shadowRadius: 4,
+    };
+
     return (
         <Tab.Navigator
             screenOptions={{
                 headerShown: false,
-                tabBarStyle: tabBarStyle,
+                tabBarStyle: dynamicTabBarStyle,
                 tabBarShowLabel: false,
             }}
         >
@@ -293,19 +309,3 @@ export function ParentNavigator() {
         </Stack.Navigator>
     );
 }
-
-// ─── Shared tab bar style ─────────────────────────────────────────────────────
-
-const tabBarStyle = {
-    backgroundColor: Colors.tabBarBg,
-    borderTopColor: Colors.tabBarBorder,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    height: Layout.tabBarHeight,
-    paddingBottom: Spacing[2],
-    paddingTop: Spacing[2],
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-};
