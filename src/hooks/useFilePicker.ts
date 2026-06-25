@@ -1,8 +1,12 @@
 import { useState, useCallback } from 'react';
-import DocumentPicker, {
-    type DocumentPickerResponse,
+import {
+    pick,
+    keepLocalCopy,
+    isErrorWithCode,
+    errorCodes,
     types as DocumentTypes,
-} from 'react-native-document-picker';
+    type DocumentPickerResponse,
+} from '@react-native-documents/picker';
 import { useAppDispatch } from '../app/store';
 import { showToast } from '../store/slices/uiSlice';
 import { FILE_CONFIG } from '../constants/config';
@@ -22,6 +26,8 @@ export interface UploadedFile {
     category: FileCategory;
 }
 
+export type PickerResult = DocumentPickerResponse & { fileCopyUri: string | null };
+
 // ─── Allowed MIME types per category ─────────────────────────────────────────
 
 const CATEGORY_MIME_TYPES: Record<string, string[]> = {
@@ -40,7 +46,7 @@ interface UseFilePickerReturn {
         category: FileCategory,
         linkedTo?: { homeworkId?: string; announcementId?: string; requestId?: string },
     ) => Promise<UploadedFile | null>;
-    pickOnly: (category: FileCategory) => Promise<DocumentPickerResponse | null>;
+    pickOnly: (category: FileCategory) => Promise<PickerResult | null>;
 }
 
 /**
@@ -59,15 +65,17 @@ export function useFilePicker(): UseFilePickerReturn {
     // ─── Step 1: Pick document ───────────────────────────────────────────────
 
     const pickOnly = useCallback(
-        async (category: FileCategory): Promise<DocumentPickerResponse | null> => {
+        async (category: FileCategory): Promise<PickerResult | null> => {
             try {
                 const allowedTypes = CATEGORY_MIME_TYPES[category] ?? [DocumentTypes.pdf];
 
-                const result = await DocumentPicker.pickSingle({
+                const [result] = await pick({
                     type: allowedTypes,
-                    copyTo: 'cachesDirectory',   // gives us a readable local URI
                     presentationStyle: 'pageSheet',
+                    allowMultiSelection: false,
                 });
+
+                if (!result) return null;
 
                 // Validate file size
                 const maxBytes = category === 'HOMEWORK_ATTACHMENT'
@@ -85,9 +93,25 @@ export function useFilePicker(): UseFilePickerReturn {
                     return null;
                 }
 
-                return result;
+                // Copy to caches directory to get a local copy URI
+                const [localCopy] = await keepLocalCopy({
+                    destination: 'cachesDirectory',
+                    files: [{
+                        uri: result.uri,
+                        fileName: result.name ?? `document_${Date.now()}.pdf`,
+                    }],
+                });
+
+                const fileCopyUri = localCopy && localCopy.status === 'success' ? localCopy.localUri : null;
+
+                return {
+                    ...result,
+                    fileCopyUri,
+                };
             } catch (err) {
-                if (DocumentPicker.isCancel(err)) return null;   // user dismissed
+                if (isErrorWithCode(err) && err.code === errorCodes.OPERATION_CANCELED) {
+                    return null; // user dismissed
+                }
                 dispatch(
                     showToast({
                         type: 'error',

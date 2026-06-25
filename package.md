@@ -26,7 +26,7 @@ npm install react-native-modal
 
 # ─── Images & Files ──────────────────────────────────────────────────────────
 npm install react-native-image-picker
-npm install react-native-document-picker
+npm install @react-native-documents/picker
 npm install react-native-fast-image            
 # cached image loading
 
