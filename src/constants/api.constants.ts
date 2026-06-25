@@ -5,15 +5,15 @@ import { Platform } from 'react-native';
 // Dev: iOS simulator uses localhost directly
 // Production: read from env / build config
 // www.schoolserver.wovigo.com
-// const DEV_BASE_URL = Platform.select({
-//     android: 'http://10.171.231.93:8000',
-//     ios: 'http://10.171.231.93:8000',
-//     default: 'http://10.171.231.93:3000',
-// });
+const DEV_BASE_URL = Platform.select({
+    android: 'http://10.129.37.93:8000',
+    ios: 'http://10.129.37.93:8000',
+    default: 'http://10.129.37.93:8000',
+});
 
 export const API_BASE_URL =
     __DEV__
-        ? 'https://www.schoolserver.wovigo.com'
+        ? DEV_BASE_URL
         : 'https://www.schoolserver.wovigo.com';   // swap to your production URL
 
 // ─── School identifier ────────────────────────────────────────────────────────
