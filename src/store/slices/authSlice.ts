@@ -120,7 +120,7 @@ const authSlice = createSlice({
             state.isFirstLogin = user.isFirstLogin;
             state.isAuthenticated = true;
             state.bootstrapError = null;
-            if (user.preferredLang) setPreferredLang(user.preferredLang);
+            if (user.preferredLang) setPreferredLang(user.preferredLang).catch(console.error);
         },
 
         // Called by baseQueryWithReauth after token refresh
@@ -165,7 +165,7 @@ const authSlice = createSlice({
             if (photoUrl !== undefined) state.photoUrl = photoUrl;
             if (preferredLang !== undefined) {
                 state.preferredLang = preferredLang;
-                setPreferredLang(preferredLang);
+                setPreferredLang(preferredLang).catch(console.error);
             }
         },
 

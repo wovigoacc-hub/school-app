@@ -10,7 +10,7 @@ import {
     selectHasMultipleChildren,
     selectChildCount,
     switchActiveChild,
-    setChildren,
+    initChildren,
 } from '../store/slices/activeChildSlice';
 import { selectIsParent } from '../store/slices/authSlice';
 import type { LinkedChild } from '../types/parent.types';
@@ -39,7 +39,7 @@ export function useActiveChild() {
     // Called once after parent profile API loads
     const loadChildren = useCallback(
         (linkedChildren: LinkedChild[]) => {
-            dispatch(setChildren(linkedChildren));
+            dispatch(initChildren(linkedChildren));
         },
         [dispatch],
     );

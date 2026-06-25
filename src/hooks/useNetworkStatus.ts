@@ -43,7 +43,7 @@ export function useNetworkStatus() {
     );
 
     const handleFlush = useCallback(async () => {
-        const queue = getOfflineQueue();
+        const queue = await getOfflineQueue();
         if (!queue.length) return;
 
         // Build a minimal MiddlewareAPI-compatible object for flushOfflineQueue

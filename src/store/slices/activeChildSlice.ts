@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '../../app/store';
 import type { LinkedChild } from '../../types/parent.types';
 import {
@@ -7,6 +7,29 @@ import {
     clearActiveChildId,
 } from '../../utils/storage.utils';
 import { clearAuth } from './authSlice';
+
+// ─── Async Thunks ─────────────────────────────────────────────────────────────
+
+export const initChildren = createAsyncThunk(
+    'activeChild/initChildren',
+    async (children: LinkedChild[]) => {
+        if (!children.length) return { children, activeChildId: null };
+
+        // Restore last selection from AsyncStorage
+        const stored = await getActiveChildId();
+        const stillLinked = stored && children.some((c) => c.studentId === stored);
+
+        let activeChildId = stored;
+        if (!stillLinked) {
+            // Default: primary child first, otherwise first in list
+            const primary = children.find((c) => c.isPrimary);
+            activeChildId = primary?.studentId ?? children[0].studentId;
+            setActiveChildId(activeChildId).catch(console.error); // Fire and forget async write
+        }
+
+        return { children, activeChildId };
+    }
+);
 
 // ─── State shape ──────────────────────────────────────────────────────────────
 
@@ -33,34 +56,6 @@ const activeChildSlice = createSlice({
     name: 'activeChild',
     initialState,
     reducers: {
-
-        // Called after parent profile loads — sets the full children list
-        // and restores the last-selected child from MMKV (or defaults to primary)
-        setChildren: (state, action: PayloadAction<LinkedChild[]>) => {
-            state.children = action.payload;
-            state.isLoaded = true;
-
-            if (!action.payload.length) {
-                state.activeChildId = null;
-                return;
-            }
-
-            // Restore last selection from MMKV
-            const stored = getActiveChildId();
-            const stillLinked =
-                stored && action.payload.some((c) => c.studentId === stored);
-
-            if (stillLinked) {
-                state.activeChildId = stored;
-            } else {
-                // Default: primary child first, otherwise first in list
-                const primary = action.payload.find((c) => c.isPrimary);
-                state.activeChildId =
-                    primary?.studentId ?? action.payload[0].studentId;
-                setActiveChildId(state.activeChildId);
-            }
-        },
-
         // Called when parent taps the child switcher
         switchActiveChild: (state, action: PayloadAction<string>) => {
             const studentId = action.payload;
@@ -69,7 +64,7 @@ const activeChildSlice = createSlice({
             if (!exists) return; // Guard: can't switch to a child not in list
 
             state.activeChildId = studentId;
-            setActiveChildId(studentId); // persist to MMKV
+            setActiveChildId(studentId).catch(console.error); // persist to AsyncStorage
         },
 
         // Called when a new child is added to the parent's account
@@ -84,7 +79,7 @@ const activeChildSlice = createSlice({
             // Auto-select if this is the first child
             if (!state.activeChildId) {
                 state.activeChildId = action.payload.studentId;
-                setActiveChildId(action.payload.studentId);
+                setActiveChildId(action.payload.studentId).catch(console.error);
             }
         },
 
@@ -93,7 +88,7 @@ const activeChildSlice = createSlice({
             state.children = [];
             state.activeChildId = null;
             state.isLoaded = false;
-            clearActiveChildId();
+            clearActiveChildId().catch(console.error);
         },
     },
     extraReducers: (builder) => {
@@ -103,11 +98,17 @@ const activeChildSlice = createSlice({
             state.activeChildId = null;
             state.isLoaded = false;
         });
+
+        // Handle async initChildren
+        builder.addCase(initChildren.fulfilled, (state, action) => {
+            state.children = action.payload.children;
+            state.activeChildId = action.payload.activeChildId;
+            state.isLoaded = true;
+        });
     },
 });
 
 export const {
-    setChildren,
     switchActiveChild,
     addChild,
     clearActiveChild,

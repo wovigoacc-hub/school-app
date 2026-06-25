@@ -24,13 +24,16 @@ export function useOfflineQueue() {
     // Sync MMKV queue count to Redux on mount
     // (in case the app was killed while there were queued actions)
     useEffect(() => {
-        const queue = getOfflineQueue();
-        dispatch(syncQueueCount(queue.length));
+        const syncQueue = async () => {
+            const queue = await getOfflineQueue();
+            dispatch(syncQueueCount(queue.length));
+        };
+        syncQueue();
     }, [dispatch]);
 
     // Read the raw queue items (for a debug/review UI if needed)
-    const getQueue = useCallback((): OfflineAction[] => {
-        return getOfflineQueue();
+    const getQueue = useCallback(async (): Promise<OfflineAction[]> => {
+        return await getOfflineQueue();
     }, []);
 
     // Manual flush trigger — used when user taps "Sync now" button
@@ -62,8 +65,8 @@ export function useOfflineQueue() {
     }, [dispatch, isOnline]);
 
     // Discard the queue entirely — used in settings or after catastrophic error
-    const discardQueue = useCallback(() => {
-        clearOfflineQueue();
+    const discardQueue = useCallback(async () => {
+        await clearOfflineQueue();
         dispatch(syncQueueCount(0));
         dispatch(
             showToast({

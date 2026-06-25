@@ -5,7 +5,7 @@ import {
     selectUserType,
     updateProfile,
 } from '../store/slices/authSlice';
-import { setChildren } from '../store/slices/activeChildSlice';
+import { initChildren } from '../store/slices/activeChildSlice';
 import { useLazyGetParentProfileQuery, useLazyGetTeacherProfileQuery } from '../services/root/profile.service';
 
 /**
@@ -32,7 +32,7 @@ export function useHydrateProfile() {
                         const { firstName, lastName, photoUrl, email, preferredLang, children } = result.data;
                         dispatch(updateProfile({ firstName, lastName, photoUrl, email, preferredLang }));
                         if (children) {
-                            dispatch(setChildren(children));
+                            dispatch(initChildren(children));
                         }
                     }
                 } else if (userType === 'teacher') {

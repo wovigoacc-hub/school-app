@@ -53,7 +53,7 @@ export function useAuth() {
     const logout = useCallback(async () => {
         try {
             // Remove device token so this device stops receiving push notifications
-            const pushToken = getCachedPushToken();
+            const pushToken = await getCachedPushToken();
             if (pushToken && userType) {
                 await removeDeviceToken({ token: pushToken, userType }).unwrap().catch(() => { });
             }

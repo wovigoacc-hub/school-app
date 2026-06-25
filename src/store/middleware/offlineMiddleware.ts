@@ -51,7 +51,7 @@ const offlineMiddleware: Middleware<{}, RootState> = (store) => (next) => (actio
                 addToOfflineQueue({
                     type: endpointName,
                     payload: originalArgs,
-                });
+                }).catch(console.error);
 
                 // Update Redux count
                 store.dispatch(incrementQueueCount());
@@ -89,7 +89,7 @@ export async function flushOfflineQueue(
     store: MiddlewareAPI,
     executeEndpoint: (name: string, args: any) => Promise<any>
 ) {
-    const queue = getOfflineQueue();
+    const queue = await getOfflineQueue();
     if (!queue.length) return;
 
     store.dispatch(setFlushing(true));
@@ -100,7 +100,7 @@ export async function flushOfflineQueue(
     for (const item of queue) {
         try {
             await executeEndpoint(item.type, item.payload);
-            removeFromOfflineQueue(item.id);
+            await removeFromOfflineQueue(item.id);
             successCount++;
         } catch (error) {
             console.error(`[Offline] Failed to sync ${item.id}:`, error);
@@ -119,7 +119,7 @@ export async function flushOfflineQueue(
         );
     } else if (successCount > 0) {
         // Partial success
-        const remaining = getOfflineQueue().length;
+        const remaining = (await getOfflineQueue()).length;
         store.dispatch(showToast({
             type: 'warning',
             message: `${successCount} synced, ${failCount} failed to sync.`,

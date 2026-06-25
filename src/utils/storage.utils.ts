@@ -1,5 +1,5 @@
 import * as Keychain from 'react-native-keychain';
-import { createMMKV } from 'react-native-mmkv';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { StoredTokens } from '../types/auth.types';
 
 // ─── Keychain service name ─────────────────────────────────────────────────────
@@ -7,15 +7,6 @@ import type { StoredTokens } from '../types/auth.types';
 // and Android EncryptedSharedPreferences / Keystore
 
 const KEYCHAIN_SERVICE = 'com.schoolbridge.auth';
-
-// ─── MMKV instance (non-sensitive fast local storage) ────────────────────────
-// Used for: offline queue, active child ID, UI preferences
-// NOT for tokens — those go in Keychain
-
-export const mmkv = createMMKV({
-    id: 'schoolbridge-store',
-    encryptionKey: 'sb-mmkv-key-2025', // static key — non-sensitive data only
-});
 
 // ─── Token storage (Keychain) ─────────────────────────────────────────────────
 
@@ -94,9 +85,9 @@ export async function hasStoredTokens(): Promise<boolean> {
     return tokens !== null;
 }
 
-// ─── MMKV helpers — fast non-sensitive storage ────────────────────────────────
+// ─── AsyncStorage helpers — slow non-sensitive storage ────────────────────────────────
 
-const MMKV_KEYS = {
+const ASYNC_KEYS = {
     ACTIVE_CHILD_ID: 'active_child_id',
     PREFERRED_LANG: 'preferred_lang',
     OFFLINE_QUEUE: 'offline_queue',
@@ -107,36 +98,37 @@ const MMKV_KEYS = {
 
 // Active child (parent role — which child is selected in switcher)
 
-export function setActiveChildId(studentId: string): void {
-    mmkv.set(MMKV_KEYS.ACTIVE_CHILD_ID, studentId);
+export async function setActiveChildId(studentId: string): Promise<void> {
+    await AsyncStorage.setItem(ASYNC_KEYS.ACTIVE_CHILD_ID, studentId);
 }
 
-export function getActiveChildId(): string | undefined {
-    return mmkv.getString(MMKV_KEYS.ACTIVE_CHILD_ID);
+export async function getActiveChildId(): Promise<string | null> {
+    return await AsyncStorage.getItem(ASYNC_KEYS.ACTIVE_CHILD_ID);
 }
 
-export function clearActiveChildId(): void {
-    mmkv.remove(MMKV_KEYS.ACTIVE_CHILD_ID);
+export async function clearActiveChildId(): Promise<void> {
+    await AsyncStorage.removeItem(ASYNC_KEYS.ACTIVE_CHILD_ID);
 }
 
 // Preferred language (mirrors DB value — used before profile loads)
 
-export function setPreferredLang(lang: string): void {
-    mmkv.set(MMKV_KEYS.PREFERRED_LANG, lang);
+export async function setPreferredLang(lang: string): Promise<void> {
+    await AsyncStorage.setItem(ASYNC_KEYS.PREFERRED_LANG, lang);
 }
 
-export function getPreferredLang(): string {
-    return mmkv.getString(MMKV_KEYS.PREFERRED_LANG) ?? 'ENGLISH';
+export async function getPreferredLang(): Promise<string> {
+    const lang = await AsyncStorage.getItem(ASYNC_KEYS.PREFERRED_LANG);
+    return lang ?? 'ENGLISH';
 }
 
 // FCM push token (cached to avoid re-registration on every app open)
 
-export function setCachedPushToken(token: string): void {
-    mmkv.set(MMKV_KEYS.PUSH_TOKEN, token);
+export async function setCachedPushToken(token: string): Promise<void> {
+    await AsyncStorage.setItem(ASYNC_KEYS.PUSH_TOKEN, token);
 }
 
-export function getCachedPushToken(): string | undefined {
-    return mmkv.getString(MMKV_KEYS.PUSH_TOKEN);
+export async function getCachedPushToken(): Promise<string | null> {
+    return await AsyncStorage.getItem(ASYNC_KEYS.PUSH_TOKEN);
 }
 
 // Offline action queue (serialised as JSON string)
@@ -149,55 +141,57 @@ export interface OfflineAction {
     retries: number;
 }
 
-export function getOfflineQueue(): OfflineAction[] {
+export async function getOfflineQueue(): Promise<OfflineAction[]> {
     try {
-        const raw = mmkv.getString(MMKV_KEYS.OFFLINE_QUEUE);
+        const raw = await AsyncStorage.getItem(ASYNC_KEYS.OFFLINE_QUEUE);
         return raw ? (JSON.parse(raw) as OfflineAction[]) : [];
     } catch {
         return [];
     }
 }
 
-export function addToOfflineQueue(action: Omit<OfflineAction, 'id' | 'createdAt' | 'retries'>): void {
-    const queue = getOfflineQueue();
+export async function addToOfflineQueue(action: Omit<OfflineAction, 'id' | 'createdAt' | 'retries'>): Promise<void> {
+    const queue = await getOfflineQueue();
     queue.push({
         ...action,
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         createdAt: Date.now(),
         retries: 0,
     });
-    mmkv.set(MMKV_KEYS.OFFLINE_QUEUE, JSON.stringify(queue));
+    await AsyncStorage.setItem(ASYNC_KEYS.OFFLINE_QUEUE, JSON.stringify(queue));
 }
 
-export function removeFromOfflineQueue(id: string): void {
-    const queue = getOfflineQueue().filter((a) => a.id !== id);
-    mmkv.set(MMKV_KEYS.OFFLINE_QUEUE, JSON.stringify(queue));
+export async function removeFromOfflineQueue(id: string): Promise<void> {
+    const queue = await getOfflineQueue();
+    const updatedQueue = queue.filter((a) => a.id !== id);
+    await AsyncStorage.setItem(ASYNC_KEYS.OFFLINE_QUEUE, JSON.stringify(updatedQueue));
 }
 
-export function clearOfflineQueue(): void {
-    mmkv.remove(MMKV_KEYS.OFFLINE_QUEUE);
+export async function clearOfflineQueue(): Promise<void> {
+    await AsyncStorage.removeItem(ASYNC_KEYS.OFFLINE_QUEUE);
 }
 
 // Onboarding flag
 
-export function setOnboarded(): void {
-    mmkv.set(MMKV_KEYS.ONBOARDED, true);
+export async function setOnboarded(): Promise<void> {
+    await AsyncStorage.setItem(ASYNC_KEYS.ONBOARDED, 'true');
 }
 
-export function isOnboarded(): boolean {
-    return mmkv.getBoolean(MMKV_KEYS.ONBOARDED) ?? false;
+export async function isOnboarded(): Promise<boolean> {
+    const value = await AsyncStorage.getItem(ASYNC_KEYS.ONBOARDED);
+    return value === 'true';
 }
 
 // ─── Full logout cleanup ──────────────────────────────────────────────────────
 
 /**
- * Clear all stored data on logout — Keychain tokens + MMKV state
+ * Clear all stored data on logout — Keychain tokens + AsyncStorage state
  * Does NOT clear the offline queue (in case there are unsynced records)
  */
 export async function clearAllAuthStorage(): Promise<void> {
     await clearTokens();
-    clearActiveChildId();
-    mmkv.remove(MMKV_KEYS.PREFERRED_LANG);
-    mmkv.remove(MMKV_KEYS.LAST_SYNC);
+    await clearActiveChildId();
+    await AsyncStorage.removeItem(ASYNC_KEYS.PREFERRED_LANG);
+    await AsyncStorage.removeItem(ASYNC_KEYS.LAST_SYNC);
     // Push token is intentionally kept — no need to re-register on next login
 }
