@@ -11,7 +11,6 @@ import {
     selectIsTeacher,
     selectIsParent,
 } from '../store/slices/authSlice';
-import { setChildren } from '../store/slices/activeChildSlice';
 import { AuthNavigator } from './AuthNavigator';
 import { TeacherNavigator } from './TeacherNavigator';
 import { ParentNavigator } from './ParentNavigator';
