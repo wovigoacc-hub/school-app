@@ -80,6 +80,9 @@ export type TeacherNavigatorParamList = {
     TeacherProfile: undefined;
     ChangePassword: undefined;
     UpdatePassword: undefined;
+
+    // ── Diary ─────────────────────────────────────────────────────────────────
+    SchoolDiary: undefined;
 };
 
 // ─── Parent bottom tabs ───────────────────────────────────────────────────────
@@ -131,6 +134,9 @@ export type ParentNavigatorParamList = {
     ParentProfile: undefined;
     ChangePassword: undefined;
     UpdatePassword: undefined;
+
+    // ── Diary ─────────────────────────────────────────────────────────────────
+    SchoolDiary: undefined;
 };
 
 // ─── Root navigator ───────────────────────────────────────────────────────────

@@ -29,6 +29,7 @@ import { TeacherProfileScreen } from '../screens/teacher/profile/TeacherProfileS
 import { UpdatePasswordScreen } from '../screens/teacher/profile/UpdatePasswordScreen';
 import { ChangePasswordScreen } from '../screens/auth/ChangePasswordScreen';
 import { NotificationInboxScreen } from '../screens/teacher/notifications/NotificationInboxScreen';
+import { TeacherDiaryScreen } from '../screens/teacher/diary/TeacherDiaryScreen';
 // ── Queries (for tab badges) ─────────────────────────────────────────────────
 import { useGetTeacherUnreadAnnouncementCountQuery }
     from '../services/teacher/announcements.service';
@@ -332,6 +333,13 @@ export function TeacherNavigator() {
                 name="UpdatePassword"
                 component={UpdatePasswordScreen}
                 options={{ title: 'Change Password' }}
+            />
+
+            {/* Diary */}
+            <Stack.Screen
+                name="SchoolDiary"
+                component={TeacherDiaryScreen}
+                options={{ title: 'School Diary' }}
             />
         </Stack.Navigator>
     );

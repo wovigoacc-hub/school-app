@@ -22,6 +22,7 @@ import { RequestCreateScreen } from '../screens/parent/requests/RequestCreateScr
 import { RequestDetailScreen } from '../screens/parent/requests/RequestDetailScreen';
 import { ParentProfileScreen } from '../screens/parent/profile/ParentProfileScreen';
 import { UpdatePasswordScreen } from '../screens/teacher/profile/UpdatePasswordScreen';
+import { ParentDiaryScreen } from '../screens/parent/diary/ParentDiaryScreen';
 
 // ── Queries ──────────────────────────────────────────────────────────────────
 import { useGetParentUnreadAnnouncementCountQuery }
@@ -305,6 +306,13 @@ export function ParentNavigator() {
                 name="UpdatePassword"
                 component={UpdatePasswordScreen}
                 options={{ title: 'Update Password' }}
+            />
+
+            {/* Diary */}
+            <Stack.Screen
+                name="SchoolDiary"
+                component={ParentDiaryScreen}
+                options={{ title: 'School Diary' }}
             />
         </Stack.Navigator>
     );

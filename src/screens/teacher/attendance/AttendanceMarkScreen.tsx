@@ -17,6 +17,7 @@ import type {
     NativeStackNavigationProp,
     NativeStackScreenProps,
 } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ScreenWrapper } from '../../../components/layout/ScreenWrapper';
 import { AppText } from '../../../components/common/AppText';
 import { AppButton } from '../../../components/common/AppButton';
@@ -51,6 +52,7 @@ export function AttendanceMarkScreen() {
     const dispatch = useAppDispatch();
     const route = useRoute<RouteProps>();
     const navigation = useNavigation<NativeStackNavigationProp<TeacherNavigatorParamList>>();
+    const insets = useSafeAreaInsets();
 
     const { classId, date = todayISODate(), subjectId } = route.params;
 
@@ -285,7 +287,7 @@ export function AttendanceMarkScreen() {
 
             {/* Fixed submit bar */}
             {marks.length > 0 && (
-                <View style={styles.submitBar}>
+                <View style={[styles.submitBar, { paddingBottom: Math.max(insets.bottom, Spacing[3]) }]}>
                     <View style={styles.submitBarLeft}>
                         <AppText variant="body2">
                             {counts.PRESENT}P · {counts.ABSENT}A
@@ -390,7 +392,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: Layout.screenPaddingH,
-        paddingVertical: Spacing[3],
+        paddingTop: Spacing[3],
+        paddingBottom: Spacing[3],
         backgroundColor: Colors.surface,
         borderTopWidth: StyleSheet.hairlineWidth,
         borderTopColor: Colors.border,

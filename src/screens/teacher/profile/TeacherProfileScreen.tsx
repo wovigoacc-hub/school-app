@@ -369,6 +369,19 @@ export function TeacherProfileScreen() {
                         </View>
                     </SectionCard>
 
+                    {/* ── School ───────────────────────────────────────────────── */}
+                    <SectionCard title="School" icon="school" iconColor="#8b5cf6">
+                        <ProfileRow
+                            icon="calendar"
+                            iconColor="#16a34a"
+                            iconBg="#f0fdf4"
+                            label="School Diary"
+                            value="Holidays, exams, events & more"
+                            isLast
+                            onPress={() => navigation.navigate('SchoolDiary')}
+                        />
+                    </SectionCard>
+
                     {/* ── Account ──────────────────────────────────────────────── */}
                     <SectionCard title="Account" icon="person-circle" iconColor="#3b82f6">
                         <ProfileRow

@@ -181,6 +181,8 @@ export const api = createApi({
         'ChildResults',
         'NotificationInbox',
         'UnreadNotificationCount',
+        'ParentDiary',
+        'TeacherDiary',
     ],
     endpoints: () => ({}),
 });
