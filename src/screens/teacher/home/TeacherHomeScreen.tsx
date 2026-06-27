@@ -269,6 +269,12 @@ export function TeacherHomeScreen() {
                     onPress={() => navigation.navigate('ExamList')}
                 />
                 <QuickActionBtn
+                    iconName="mail-outline"
+                    iconColor={Colors.error}
+                    label="Requests"
+                    onPress={() => navigation.navigate('RequestList')}
+                />
+                <QuickActionBtn
                     iconName="megaphone-outline"
                     iconColor={Colors.parent}
                     label="Announce"

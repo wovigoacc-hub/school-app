@@ -10,6 +10,7 @@ import { ScreenWrapper } from '../../../components/layout/ScreenWrapper';
 import { SectionHeader } from '../../../components/layout/SectionHeader';
 import { Spacer } from '../../../components/layout/Divider';
 import { AppText } from '../../../components/common/AppText';
+import { AppButton } from '../../../components/common/AppButton';
 import { AppRefreshControl, useRefresh } from '../../../components/common/AppRefreshControl';
 import { SkeletonCard } from '../../../components/common/AppSkeleton';
 import { ChildSwitcher } from '../../../components/child/ChildSwitcher';
@@ -31,6 +32,9 @@ import {
     useGetParentAnnouncementFeedQuery,
     useMarkParentAnnouncementsReadMutation,
 } from '../../../services/parent/announcements.service';
+import {
+    useGetParentRequestsQuery,
+} from '../../../services/parent/requests.service';
 import { Colors } from '../../../constants/colors';
 import { Layout, Spacing } from '../../../constants/spacing';
 import type { LinkedChild } from '../../../types/parent.types';
@@ -85,6 +89,14 @@ export function ParentHomeScreen() {
         refetch: refetchAnnouncements,
         isLoading: announcementsLoading,
     } = useGetParentAnnouncementFeedQuery({ limit: 5 }, { skip: !activeChildId });
+
+    const { data: requestsData } = useGetParentRequestsQuery(
+        { limit: 10 },
+        { skip: !activeChildId },
+    );
+    const openRequestCount = (requestsData?.data ?? []).filter(
+        (r) => r.status === 'SUBMITTED' || r.status === 'UNDER_REVIEW',
+    ).length;
 
     const [markRead] = useMarkParentAnnouncementsReadMutation();
 
@@ -217,6 +229,38 @@ export function ParentHomeScreen() {
                     )}
                 </View>
 
+                {/* ── My Requests ──────────────────────────────────────────── */}
+                <View style={styles.section}>
+                    <SectionHeader
+                        title="My Requests"
+                        count={openRequestCount > 0 ? openRequestCount : undefined}
+                        actionLabel="See all"
+                        onAction={() => navigation.navigate('RequestList')}
+                    />
+                    <View style={styles.requestRow}>
+                        <AppButton
+                            label={openRequestCount > 0
+                                ? `${openRequestCount} open request${openRequestCount > 1 ? 's' : ''}`
+                                : 'View Requests'}
+                            variant="secondary"
+                            size="sm"
+                            onPress={() => navigation.navigate('RequestList')}
+                            style={styles.requestBtn}
+                        />
+                        <AppButton
+                            label="+ Raise Request"
+                            variant="primary"
+                            size="sm"
+                            onPress={() =>
+                                navigation.navigate('RequestCreate', {
+                                    studentId: activeChild?.studentId,
+                                })
+                            }
+                            style={styles.requestBtn}
+                        />
+                    </View>
+                </View>
+
                 {/* ── Recent announcements ─────────────────────────────────── */}
                 <View style={styles.section}>
                     <SectionHeader
@@ -288,6 +332,14 @@ const styles = StyleSheet.create({
     section: {
         paddingHorizontal: Layout.screenPaddingH,
         marginTop: Spacing[4],
+    },
+    requestRow: {
+        flexDirection: 'row',
+        gap: Spacing[2],
+        marginTop: Spacing[2],
+    },
+    requestBtn: {
+        flex: 1,
     },
     announcementCard: {
         marginBottom: Spacing[3],

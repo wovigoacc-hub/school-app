@@ -408,6 +408,14 @@ export function ParentProfileScreen() {
                     {/* ── School ───────────────────────────────────────────────── */}
                     <SectionCard title="School" icon="school" iconColor="#8b5cf6">
                         <ProfileRow
+                            icon="mail"
+                            iconColor="#6366f1"
+                            iconBg="#eef2ff"
+                            label="My Requests"
+                            value="View and raise requests to the school"
+                            onPress={() => navigation.navigate('RequestList')}
+                        />
+                        <ProfileRow
                             icon="calendar"
                             iconColor="#16a34a"
                             iconBg="#f0fdf4"
