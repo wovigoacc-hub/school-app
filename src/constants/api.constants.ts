@@ -6,9 +6,9 @@ import { Platform } from 'react-native';
 // Production: read from env / build config
 // www.schoolserver.wovigo.com
 const DEV_BASE_URL = Platform.select({
-    android: 'http://10.129.37.93:8000',
-    ios: 'http://10.129.37.93:8000',
-    default: 'http://10.129.37.93:8000',
+    android: 'https://www.schoolserver.wovigo.com',
+    ios: 'https://www.schoolserver.wovigo.com',
+    default: 'https://www.schoolserver.wovigo.com',
 });
 
 export const API_BASE_URL =
